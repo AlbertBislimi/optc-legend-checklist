@@ -1,0 +1,50 @@
+.flair-wrapper, .flair {
+height:50px;
+width:50px;
+cursor:pointer;
+margin-right:6px;
+margin-top:6px;
+border:3px solid transparent;
+background-clip:padding-box;
+background-size: contain;
+display: inline-block;
+}
+
+
+.selected + .flair-level {
+  display: block;
+}
+
+.flair-wrapper{
+  position: relative;
+}
+
+.flair-level{
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 0px;
+  z-index: 100;
+}
+
+#show-base {
+  display: none;
+}
+
+@media only screen and (min-width: 1921px) {
+  .flair-wrapper {
+    height:70px;
+    width:70px;
+  }
+}
+
+@media only screen and (max-width: 760px) {
+  .flair-wrapper {
+    height:40px;
+    width:40px;
+  }
+}
+
+.disabled, .hidden {
+  display: none;
+}

@@ -1,0 +1,369 @@
+var OPTC_DB_ROOT = 'https://2shankz.github.io/optc-db.github.io';
+
+var fallbackLegendIds = [
+	261,1413,
+	367,1619,
+	416,1445,
+	459,1847,
+	530,1707,
+	562,1816,
+	578,
+	649,2868,
+	669,1492,
+	718,1881,
+	720,1927,
+	748,1663,
+	870,2444,
+	935,2066,
+	1001,2195,
+	1035,1928,
+	1045,2001,
+	1085,2954,
+	1123,2357,
+	1192,1764,
+	1240,2034,
+	1268,3154,
+	1314,2578,
+	1362,1921,
+	1391,2035,
+	1404,1593,
+	1434,1880,
+	1473,2631,
+	1532,1543,
+	1571,2372,
+	1588,2245,
+	1610,2232,
+	1652,2373,
+	1698,2159,
+	1747,2434,
+	1751,1922,
+	1763,2784,
+	1794,2814,
+	1832,2138,
+	1869,2505,
+	1883,3018,
+	1910,3550,
+	1935,2300,
+	1951,2830,
+	1985,
+	2007,
+	2023,3625,
+	2025,3592,
+	2074,2363,
+	2076,2588,
+	2099,
+	2113,2739,
+	2148,3211,
+	2181,
+	2201,3693,
+	2234,2500,
+	2236,3510,
+	2251,2991,
+	2265,3048,
+	2302,3079,
+	2330,
+	2338,3417,
+	2365,3666,
+	2418,3868,
+	2433,3448,
+	2441,3393,
+	2446,
+	2465,3298,
+	2475,3240,
+	2477,3202,
+	2534,
+	2536,
+	2561,
+	2577,3828,
+	2601,
+	2603,
+	2651,2681,
+	2672,
+	2686,2909,
+	2700,
+	2741,3742,
+	2774,3275,
+	2776,3350,
+	2797,3784,
+	2802,
+	2804,
+	2835,
+	2837,3469,
+	2860,
+	2862,3845,
+	2895,
+	2897,
+	2930,
+	2958,
+	2960,3718,
+	2962,
+	2964,3739,
+	2980,3762,
+	2982,
+	3007,
+	3009,3805,
+	3027,
+	3038,
+	3065,
+	3071,3369,
+	3073,
+	3100,
+	3102,
+	3118,
+	3135,
+	3157,
+	3164,
+	3166,
+	3175,3519,
+	3177,3786,
+	3204,
+	3225,
+	3227,
+	3245,
+	3253,
+	3278,
+	3280,
+	3282,
+	3300,
+	3307,
+	3334,3814,
+	3336,
+	3338,
+	3349,
+	3355,
+	3357,
+	3364,
+	3376,
+	3378,
+	3391,
+	3398,
+	3403,
+	3405,
+	3411,
+	3422,
+	3427,
+	3429,3430,
+	3433,
+	3452,
+	3454,
+	3462,
+	3472,
+	3474,
+	3483,
+	3493,
+	3495,
+	3508,
+	3513,
+	3515,
+	3523,
+	3534,
+	3536,
+	3543,
+	3553,
+	3555,
+	3563,
+	3574,
+	3576,
+	3582,
+	3590,
+	3595,
+	3597,
+	3607,
+	3609,
+	3611,
+	3613,
+	3629,
+	3631,
+	3637,
+	3641,
+	3650,
+	3652,
+	3654,
+	3670,
+	3674,
+	3676,
+	3680,3721,3816,
+	3682,
+	3695,
+	3697,
+	3706,
+	3708,
+	3723,
+	3730,
+	3735,
+	3741,
+	3745,
+	3752,
+	3755,
+	3766,
+	3772,
+	3775,
+	3780,
+	3788,
+	3790,
+	3792,
+	3809,
+	3811,
+	3824,
+	3830,
+	3832,
+	3839,
+	3850,
+	3852,
+	3859,
+	3861,
+	3870,
+	3878,
+	3880,
+	3889,
+	3891,
+	5014,
+];
+
+function getLegendIconUrl(id) {
+	if (window.units && window.units[id]) {
+		var paddedId = ('0000' + id).slice(-4);
+		var folder = Math.trunc(id / 1000) + '/' + Math.trunc((id % 1000) / 100) + '00';
+		return OPTC_DB_ROOT + '/api/images/thumbnail/glo/' + folder + '/' + paddedId + '.png';
+	}
+
+	return 'images/icons/' + id + '.png';
+}
+
+function getLegendIds() {
+	if (!window.units || !window.flags) {
+		return fallbackLegendIds;
+	}
+
+	var fallbackMap = fallbackLegendIds.reduce(function(map, id) {
+		map[id] = true;
+		return map;
+	}, {});
+
+	return Object.keys(window.units).filter(function(id) {
+		var unit = window.units[id];
+		var flag = window.flags[id];
+		var stars = String(unit.stars || '');
+		var cost = Number(unit.cost) || 0;
+		return fallbackMap[id] || (stars.indexOf('6') !== -1 && cost >= 40 && flag && (flag.rr || flag.rro));
+	}).map(function(id) {
+		return parseInt(id, 10);
+	}).sort(function(a, b) {
+		return a - b;
+	});
+}
+
+function getLegendBasePairs(legendIds) {
+	if (!window.evolutions) {
+		return null;
+	}
+
+	var legendMap = legendIds.reduce(function(map, id) {
+		map[id] = true;
+		return map;
+	}, {});
+
+	var pairs = [];
+	Object.keys(window.evolutions).forEach(function(baseId) {
+		baseId = parseInt(baseId, 10);
+		var evolution = window.evolutions[baseId].evolution;
+		var evos = Array.isArray(evolution) ? evolution : [evolution];
+		evos.forEach(function(evoId) {
+			evoId = parseInt(evoId, 10);
+			if (legendMap[baseId] && legendMap[evoId]) {
+				pairs.push({base: baseId, evo: evoId});
+			}
+		});
+	});
+
+	return pairs;
+}
+
+function orderLegendIds(legendIds, basePairs) {
+	if (!basePairs || !basePairs.length) {
+		return legendIds;
+	}
+
+	var groupedEvos = basePairs.reduce(function(map, pair) {
+		if (!map[pair.base]) {
+			map[pair.base] = [];
+		}
+		map[pair.base].push(pair.evo);
+		return map;
+	}, {});
+	var evoMap = basePairs.reduce(function(map, pair) {
+		map[pair.evo] = true;
+		return map;
+	}, {});
+	var seen = {};
+	var ordered = [];
+
+	function appendWithEvos(id) {
+		if (seen[id]) {
+			return;
+		}
+
+		ordered.push(id);
+		seen[id] = true;
+
+		if (groupedEvos[id]) {
+			groupedEvos[id].sort(function(a, b) {
+				return a - b;
+			}).forEach(function(evoId) {
+				appendWithEvos(evoId);
+			});
+		}
+	}
+
+	legendIds.forEach(function(id) {
+		if (seen[id] || evoMap[id]) {
+			return;
+		}
+
+		appendWithEvos(id);
+	});
+
+	legendIds.forEach(function(id) {
+		appendWithEvos(id);
+	});
+
+	return ordered;
+}
+
+loadPage = function() {
+
+	var flair_class = '';
+
+	//SPECIAL FLAIRS
+	loadSpecial = function() {
+		var enter = document.getElementById('special');
+
+		var legendIds = getLegendIds();
+		window.optcDbBasePairs = getLegendBasePairs(legendIds);
+		var name = orderLegendIds(legendIds, window.optcDbBasePairs);
+
+		//creates HTML for special flairs
+		for (var v in name) {
+				var flair_wrapper = document.createElement('div');
+				flair_wrapper.classList.add('flair-wrapper');
+				var flair_level = document.createElement('span');
+				flair_level.classList.add('flair-level');
+				flair_level.textContent = '0';
+				flair_wrapper.setAttribute('class', 'flair-wrapper');
+				var flair_special = document.createElement('img');
+				flair_special.setAttribute('class', 'flair level-0');
+				flair_special.setAttribute('id', name[v]);
+				flair_special.setAttribute('alt', window.units && window.units[name[v]] ? window.units[name[v]].name : name[v]);
+				flair_special.setAttribute('title', window.units && window.units[name[v]] ? window.units[name[v]].name : name[v]);
+				flair_special.setAttribute('crossorigin', 'anonymous');
+				flair_special.setAttribute('src', getLegendIconUrl(name[v]));
+				flair_wrapper.appendChild(flair_special);
+				flair_wrapper.appendChild(flair_level);
+				enter.appendChild(flair_wrapper);
+		}
+	}
+	loadSpecial();
+}
+
+//waits for DOM to load before executing function
+document.addEventListener('DOMContentLoaded', loadPage, false);
