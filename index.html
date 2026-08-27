@@ -8,14 +8,14 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-pool-filter">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-safe-shares">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker"></script>
-  <script defer src="js/scripts.js?v=legend-locker-pool-filter"></script>
+  <script defer src="js/scripts.js?v=legend-locker-safe-shares"></script>
 </head>
 
 <body>
@@ -33,12 +33,20 @@
           <h2>Build your legend roster.</h2>
         </div>
         <div class="topbar-actions">
-          <span class="save-note"><span class="save-dot" aria-hidden="true"></span>Saved automatically</span>
+          <span id="save-note" class="save-note"><span class="save-dot" aria-hidden="true"></span><span id="save-note-text">Saved automatically</span></span>
           <button class="button button-primary" id="share-button" type="button">Share collection</button>
           <button class="button button-secondary" id="backup-button" type="button">Backup</button>
           <button class="button button-danger" id="reset-button" type="button">Reset progress</button>
         </div>
       </header>
+
+      <section id="shared-collection-notice" class="shared-collection-notice" role="status" hidden>
+        <div>
+          <p class="eyebrow">Shared collection preview</p>
+          <p>You’re viewing someone else’s collection. Your saved progress has not been changed.</p>
+        </div>
+        <button id="save-shared-copy" class="button button-primary" type="button">Save a copy to edit</button>
+      </section>
 
       <section class="progress-grid" aria-label="Collection totals">
         <article class="progress-card">
@@ -156,7 +164,7 @@
       </section>
 
       <section id="share-view" class="transfer-view" hidden>
-        <p>Share this link to let someone open a copy of your current collection. Their copy stays separate from yours.</p>
+        <p>Share this link to let someone view your current collection. Their saved progress stays untouched unless they choose to save a copy.</p>
         <textarea id="share-link" readonly aria-label="Shareable collection link"></textarea>
         <div class="dialog-actions share-actions">
           <button id="copy-share-link" class="button button-primary" type="button">Copy share link</button>

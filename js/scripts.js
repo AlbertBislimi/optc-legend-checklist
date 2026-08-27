@@ -13,6 +13,7 @@
   var state = {
     legends: [],
     progress: {},
+    sharedPreview: false,
     filter: 'all',
     legendPool: 'all',
     search: '',
@@ -108,11 +109,12 @@
 
   function loadProgress() {
     var sharedProgress = readSharedProgress();
+    state.sharedPreview = Boolean(sharedProgress);
     state.progress = sharedProgress || readSavedProgress() || migrateLegacyProgress();
-    if (sharedProgress) saveProgress();
   }
 
   function saveProgress() {
+    if (state.sharedPreview) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
     } catch (error) {
@@ -255,6 +257,7 @@
     card.classList.toggle('is-owned', progress.owned);
     card.classList.toggle('is-rainbow', progress.rainbow);
     card.classList.toggle('has-llb', progress.llb > 0);
+    card.classList.toggle('is-shared-preview', state.sharedPreview);
     portrait.setAttribute('aria-pressed', String(progress.owned));
     portrait.setAttribute('aria-label', (progress.owned ? 'Remove ' : 'Add ') + legend.name + (progress.owned ? ' from owned legends' : ' to owned legends'));
     image.src = legend.image;
@@ -269,6 +272,9 @@
     rainbow.setAttribute('aria-pressed', String(progress.rainbow));
     rainbow.setAttribute('aria-label', (progress.rainbow ? 'Remove rainbow status from ' : 'Mark ') + legend.name + (progress.rainbow ? '' : ' as rainbowed'));
     llb.value = String(progress.llb);
+    portrait.disabled = state.sharedPreview;
+    rainbow.disabled = state.sharedPreview;
+    llb.disabled = state.sharedPreview;
   }
 
   function buildCard(legend) {
@@ -278,6 +284,7 @@
   }
 
   function renderGrid() {
+    updateSharedPreview();
     var visible = listVisibleLegends();
     var fragment = document.createDocumentFragment();
     elements.grid.innerHTML = '';
@@ -294,6 +301,14 @@
 
     elements.visibleCount.textContent = visible.length + ' of ' + state.legends.length + ' legends shown';
     updateCounters();
+  }
+
+  function updateSharedPreview() {
+    elements.sharedCollectionNotice.hidden = !state.sharedPreview;
+    elements.saveNote.classList.toggle('is-shared-preview', state.sharedPreview);
+    elements.saveNoteText.textContent = state.sharedPreview ? 'Shared preview · not saved' : 'Saved automatically';
+    elements.resetButton.disabled = state.sharedPreview;
+    elements.resetButton.title = state.sharedPreview ? 'Save a copy before resetting this collection.' : '';
   }
 
   function updateLegendPoolOptions() {
@@ -315,6 +330,7 @@
   }
 
   function onGridClick(event) {
+    if (state.sharedPreview) return;
     var action = event.target.closest('[data-action]');
     if (!action || action.tagName === 'SELECT') return;
     var card = action.closest('.legend-card');
@@ -339,6 +355,7 @@
   }
 
   function onGridChange(event) {
+    if (state.sharedPreview) return;
     var select = event.target.closest('select[data-action="llb"]');
     if (!select) return;
     var card = select.closest('.legend-card');
@@ -360,6 +377,7 @@
   }
 
   function resetProgress() {
+    if (state.sharedPreview) return;
     if (!window.confirm('Reset all ownership, Rainbow, and LLB progress saved in this browser?')) return;
     state.progress = {};
     saveProgress();
@@ -407,6 +425,19 @@
       ? window.LZString.compressToEncodedURIComponent(payload)
       : encodeURIComponent(payload);
     return window.location.origin + window.location.pathname + '#progress=' + encoded;
+  }
+
+  function clearSharedHash() {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+
+  function saveSharedCopy() {
+    if (!state.sharedPreview) return;
+    state.sharedPreview = false;
+    clearSharedHash();
+    compactProgress();
+    saveProgress();
+    renderGrid();
   }
 
   function copyText(text, input, successMessage) {
@@ -700,6 +731,8 @@
 
     try {
       state.progress = parseImportedProgress(raw);
+      state.sharedPreview = false;
+      clearSharedHash();
       saveProgress();
       renderGrid();
       elements.importData.value = '';
@@ -737,6 +770,7 @@
     elements.nativeShareLink.addEventListener('click', nativeShareLink);
     elements.downloadImage.addEventListener('click', generateShareImage);
     elements.applyImport.addEventListener('click', importBackup);
+    elements.saveSharedCopy.addEventListener('click', saveSharedCopy);
     document.querySelector('.dialog-tabs').addEventListener('click', function (event) {
       var tab = event.target.closest('[data-transfer-view]');
       if (tab) setTransferView(tab.dataset.transferView);
@@ -758,6 +792,10 @@
     elements.rainbowMeter = byId('rainbow-meter');
     elements.llbMeter = byId('llb-meter');
     elements.resetButton = byId('reset-button');
+    elements.sharedCollectionNotice = byId('shared-collection-notice');
+    elements.saveSharedCopy = byId('save-shared-copy');
+    elements.saveNote = byId('save-note');
+    elements.saveNoteText = byId('save-note-text');
     elements.backupButton = byId('backup-button');
     elements.shareButton = byId('share-button');
     elements.backupDialog = byId('backup-dialog');
