@@ -1,141 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-  <title>OPTC Legend Checklist</title>
-
-  <link rel="icon" type="image/x-icon" href="red.ico">
-
-  <!--stylesheets-->
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-  <link rel="stylesheet" href="css/flairs.css" type="text/css" media="all" />
-
-
-  <!--scripts-->
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script type="text/javascript" src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
-  <script type="text/javascript" src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
-  <script type="text/javascript" src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
-  <script type="text/javascript" src="js/flairs.js"></script>
-  <script type="text/javascript" src="js/scripts.js"></script>
-  <script type="text/javascript" src="js/dom-to-image.js"></script>
-  <script src="js/FileSaver.js"></script>
-  <script src="js/lz-string.js"></script>
-
-  <!--meta-->
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="antonlabz">
-  <meta name="description" content="Legend Checklist for OPTC">
+  <meta name="description" content="A modern collection tracker for One Piece Treasure Cruise legends.">
   <link rel="canonical" href="https://optc-checklist.vercel.app">
+  <title>OPTC Legend Locker</title>
+  <link rel="icon" type="image/x-icon" href="red.ico">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-pool-filter">
+
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
+  <script src="js/lz-string.js?v=legend-locker"></script>
+  <script src="js/flairs.js?v=legend-locker"></script>
+  <script defer src="js/scripts.js?v=legend-locker-pool-filter"></script>
 </head>
 
 <body>
   <noscript>JavaScript is required to run this page.</noscript>
 
-  <div class="header"></div>
-  <div>Legend data and icons are loaded from the <a href="https://2shankz.github.io/optc-db.github.io/characters/#/search/">2Shankz OPTC Database</a> when available.</div>
-  <span id="counter"></span>
-  <br>
-  <span id="counter2"></span>
-  <br>
-  <span id="rainbow"></span>
-  <br>
-  <span id="srainbow"></span>
+  <div class="app-shell">
+    <main id="top" class="main-content">
+      <header class="topbar">
+      <a class="brand" href="#top" aria-label="OPTC Legend Locker home">
+        <span class="brand-mark">OPTC</span>
+        <span>legend locker</span>
+      </a>
+        <div class="topbar-title">
+          <p class="eyebrow">Legend collection</p>
+          <h2>Build your legend roster.</h2>
+        </div>
+        <div class="topbar-actions">
+          <span class="save-note"><span class="save-dot" aria-hidden="true"></span>Saved automatically</span>
+          <button class="button button-primary" id="share-button" type="button">Share collection</button>
+          <button class="button button-secondary" id="backup-button" type="button">Backup</button>
+          <button class="button button-danger" id="reset-button" type="button">Reset progress</button>
+        </div>
+      </header>
 
-  <div class="buttons">
-    <button id="select-all">Select All</button>
-    <button id="select-none">Reset</button>
-    <button id="show-base">Show ★6 Forms of Super-Evos</button>
-    <button id="hide-base">Hide ★6 Forms of Super-Evos</button>
-    <button id="show-hidden">Unhide Removed Legends</button>
-    <button id="list-hidden">List Removed Legends</button>
-    <button id="generate" onclick="generateImage()">Generate Image</button>
-    <button onclick="toggleModal3()">Import/Export</button>
+      <section class="progress-grid" aria-label="Collection totals">
+        <article class="progress-card">
+          <div class="progress-card-heading">
+            <span>Owned</span>
+            <span class="progress-icon owned-icon">✓</span>
+          </div>
+          <strong id="owned-count">0 <small>/ 0</small></strong>
+          <div class="meter"><span id="owned-meter"></span></div>
+        </article>
+        <article class="progress-card">
+          <div class="progress-card-heading">
+            <span>Rainbow</span>
+            <span class="progress-icon rainbow-icon">◈</span>
+          </div>
+          <strong id="rainbow-count">0 <small>/ 0</small></strong>
+          <div class="meter rainbow-meter"><span id="rainbow-meter"></span></div>
+        </article>
+        <article class="progress-card">
+          <div class="progress-card-heading">
+            <span>LLB 5</span>
+            <span class="progress-icon llb-icon">5</span>
+          </div>
+          <strong id="llb-count">0 <small>/ 0</small></strong>
+          <div class="meter llb-meter"><span id="llb-meter"></span></div>
+        </article>
+      </section>
+
+      <section class="collection-panel" aria-labelledby="collection-title">
+        <div class="collection-heading">
+          <div>
+          <p class="eyebrow">Collection manager</p>
+            <h2 id="collection-title">Your legend box</h2>
+          </div>
+          <p class="instruction"><strong>Quick edit:</strong> click a portrait to toggle ownership, then use the controls below it for Rainbow and LLB. Share your finished box as a link or image.</p>
+        </div>
+
+        <div class="toolbar">
+          <label class="search-field" for="legend-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="legend-search" type="search" placeholder="Search a legend" autocomplete="off">
+          </label>
+
+          <div class="filter-group" role="group" aria-label="Legend status filter">
+            <button class="filter-button is-active" type="button" data-filter="all">All</button>
+            <button class="filter-button" type="button" data-filter="owned">Owned</button>
+            <button class="filter-button" type="button" data-filter="rainbow">Rainbow</button>
+            <button class="filter-button" type="button" data-filter="llb">LLB 1+</button>
+          </div>
+
+          <label class="sort-field legend-pool-field" for="legend-pool">
+            <span>Legend pool</span>
+            <select id="legend-pool">
+              <option value="all">All legends</option>
+              <option value="super-sugo">Super Sugo</option>
+              <option value="anniversary">Anniversary</option>
+              <option value="kizuna">Kizuna</option>
+              <option value="treasure-map">Treasure Map</option>
+              <option value="pirate-festival">Pirate Festival</option>
+            </select>
+          </label>
+
+          <label class="sort-field" for="sort-order">
+            <span>Sort</span>
+            <select id="sort-order">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="collection-meta">
+          <span id="visible-count">Loading legends…</span>
+          <label class="base-toggle">
+            <input id="base-toggle" type="checkbox" checked>
+            <span>Show base forms of Super Evolutions</span>
+          </label>
+        </div>
+
+        <div id="legend-grid" class="legend-grid" aria-live="polite"></div>
+      </section>
+    </main>
   </div>
 
-  <div class="modal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <span class="modal-text">Image Export</span>
-        <button id="image-download" onclick="download()">Download Image</button>
-        <p><i>(otherwise, <code>right-click > copy</code>)</i></p>
-        <span class="close-btn">&times;</span>
+  <dialog id="backup-dialog" class="backup-dialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">Keep your collection safe</p>
+          <h2>Back up &amp; share</h2>
+        </div>
+        <button class="icon-button" value="cancel" type="submit" aria-label="Close backup dialog">×</button>
       </div>
-      <div class="modal-content"></div>
-    </div>
-  </div>
 
-  <div class="modal2">
-    <div class="modal-container">
-      <div class="modal-header">
-        <span class="modal-text">Removed Legends</span>
-        <p><i>(Click icons to unhide legends)</i></p>
-        <span class="close-btn2">&times;</span>
+      <div class="dialog-tabs" role="tablist" aria-label="Collection data options">
+        <button class="dialog-tab is-active" type="button" data-transfer-view="export">Export</button>
+        <button class="dialog-tab" type="button" data-transfer-view="import">Import</button>
+        <button class="dialog-tab" type="button" data-transfer-view="share">Share</button>
       </div>
-      <div class="modal-content2"></div>
-    </div>
-  </div>
 
-  <div class="modal3">
-    <div class="modal-container">
-      <div class="modal-header">
-        <span class="modal-text">Import/Export Checklist</span>
-        <span class="close-btn3">&times;</span>
+      <section id="export-view" class="transfer-view">
+        <p>Copy this text and keep it somewhere safe. You can paste it into Import on any device.</p>
+        <textarea id="export-data" readonly aria-label="Exported collection data"></textarea>
+        <button id="copy-export" class="button button-primary" type="button">Copy backup</button>
+      </section>
+
+      <section id="import-view" class="transfer-view" hidden>
+        <p>Paste a backup here. Importing replaces the progress currently saved in this browser.</p>
+        <textarea id="import-data" placeholder="Paste a backup…" aria-label="Collection backup to import"></textarea>
+        <div class="dialog-actions">
+          <button class="button button-secondary" value="cancel" type="submit">Cancel</button>
+          <button id="apply-import" class="button button-primary" type="button">Import progress</button>
+        </div>
+      </section>
+
+      <section id="share-view" class="transfer-view" hidden>
+        <p>Share this link to let someone open a copy of your current collection. Their copy stays separate from yours.</p>
+        <textarea id="share-link" readonly aria-label="Shareable collection link"></textarea>
+        <div class="dialog-actions share-actions">
+          <button id="copy-share-link" class="button button-primary" type="button">Copy share link</button>
+          <button id="native-share-link" class="button button-secondary" type="button">Share link</button>
+        </div>
+
+        <div class="image-export">
+          <div>
+            <h3>Compact collection image</h3>
+            <p>Save a one-page image with every legend and its current status.</p>
+          </div>
+          <button id="download-image" class="button button-secondary" type="button">Save image</button>
+        </div>
+      </section>
+      <p id="transfer-feedback" class="transfer-feedback" role="status"></p>
+    </form>
+  </dialog>
+
+  <template id="legend-card-template">
+    <article class="legend-card">
+      <button class="portrait-button" type="button" data-action="owned">
+        <img class="legend-art" alt="" loading="lazy">
+        <span class="owned-badge">Owned</span>
+        <span class="llb-badge" hidden>LLB 0/5</span>
+        <span class="legend-type"></span>
+      </button>
+      <div class="legend-details">
+        <p class="legend-id"></p>
+        <h3 class="legend-name"></h3>
+        <div class="legend-controls">
+          <button class="rainbow-button" type="button" data-action="rainbow" aria-pressed="false">
+            <span aria-hidden="true">◈</span> Rainbow
+          </button>
+          <label class="llb-control">
+            <span>LLB</span>
+            <select data-action="llb" aria-label="Level Limit Break">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+        </div>
       </div>
-      <div class="modal-content3">
-        <p class="warning">WARNING: Importing WILL overwrite your current checklist.</p>
-        <button id="import" onclick="toggleImport()">Import Checklist</button>
-        <button id="export" onclick="exportSelection()">Export Checklist</button>
-        <input type="text" id="import-text"><button id="apply-import" onclick="importSelection()">Apply</button>
-        <input type="text" id="export-text" onclick="this.setSelectionRange(0, this.value.length)"><button id="copy-export" onclick="copySelection()">Copy</button>
-        <div id="display-copied">Copied to clipboard!</div>
-        <div id="imported">Checklist imported!</div>
-        <div id="undefined">Invalid data, please generate a new export</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container2">
-    <label class="switch">
-      <input id="switch" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <span class="tooltip">- rainbow mode</span>
-
-    <label class="switch3">
-      <input id="switch2" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <span class="tooltip3">- super rainbow mode</span>
-
-    <label class="switch2">
-      <input id="check4" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <span class="tooltip2">- LLB mode </span>
-
-    <label class="switch4">
-      <input id="hide-legends" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <span class="tooltip4">- remove legends from list</span>
-
-      <div class="icon-container">
-        <div id="special"></div>
-      </div>
-  </div>
-
+    </article>
+  </template>
 </body>
-
-<footer>
-  <div>
-    2019 -
-    <script>
-    document.write(new Date().getFullYear());
-    </script>.
-    Created by <a href="https://www.reddit.com/user/antonlabz/">antonlabz</a>. Maintained by <a href="http://www.reddit.com/message/compose/?to=CubeoHS&subject=OPTC%20Legend%20Checklist">CubeoHS</a>.
-  </div>
-</footer>
-
 </html>

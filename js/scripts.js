@@ -1,643 +1,788 @@
-//effectively links super-evos with their base forms
-var base = [
-  {base: 261, evo: 1413},
-  {base: 367, evo: 1619},
-  {base: 416, evo: 1445},
-  {base: 459, evo: 1847},
-  {base: 530, evo: 1707},
-  {base: 562, evo: 1816},
-  {base: 649, evo: 2868},
-  {base: 669, evo: 1492},
-  {base: 718, evo: 1881},
-  {base: 720, evo: 1927},
-  {base: 748, evo: 1663},
-  {base: 870, evo: 2444},
-  {base: 935, evo: 2066},
-  {base: 1001, evo: 2195},
-  {base: 1035, evo: 1928},
-  {base: 1045, evo: 2001},
-  {base: 1085, evo: 2954},
-  {base: 1123, evo: 2357},
-  {base: 1192, evo: 1764},
-  {base: 1240, evo: 2034},
-  {base: 1268, evo: 3154},
-  {base: 1314, evo: 2578},
-  {base: 1362, evo: 1921},
-  {base: 1391, evo: 2035},
-  {base: 1404, evo: 1593},
-  {base: 1434, evo: 1880},
-  {base: 1473, evo: 2631},
-  {base: 1532, evo: 1543},
-  {base: 1571, evo: 2372},
-  {base: 1588, evo: 2245},
-  {base: 1610, evo: 2232},
-  {base: 1652, evo: 2373},
-  {base: 1698, evo: 2159},
-  {base: 1747, evo: 2434},
-  {base: 1751, evo: 1922},
-  {base: 1763, evo: 2784},
-  {base: 1794, evo: 2814},
-  {base: 1832, evo: 2138},
-  {base: 1869, evo: 2505},
-  {base: 1883, evo: 3018},
-  {base: 1910, evo: 3550},
-  {base: 1935, evo: 2300},
-  {base: 1951, evo: 2830},
-  {base: 2023, evo: 3625},
-  {base: 2025, evo: 3592},
-  {base: 2074, evo: 2363},
-  {base: 2076, evo: 2588},
-  {base: 2113, evo: 2739},
-  {base: 2201, evo: 3693},
-  {base: 2234, evo: 2500},
-  {base: 2251, evo: 2991},
-  {base: 2265, evo: 3048},
-  {base: 2302, evo: 3079},
-  {base: 2418, evo: 3868},
-  {base: 2433, evo: 3448},
-  {base: 2477, evo: 3202},
-  {base: 2651, evo: 2681},
-  {base: 2686, evo: 2909},
-  {base: 2148, evo: 3211},
-  {base: 2236, evo: 3510},
-  {base: 2338, evo: 3417},
-  {base: 2365, evo: 3666},
-  {base: 2441, evo: 3393},
-  {base: 2465, evo: 3298},
-  {base: 2475, evo: 3240},
-  {base: 2577, evo: 3828},
-  {base: 2741, evo: 3742},
-  {base: 2774, evo: 3275},
-  {base: 2776, evo: 3350},
-  {base: 2797, evo: 3784},
-  {base: 2837, evo: 3469},
-  {base: 2862, evo: 3845},
-  {base: 2960, evo: 3718},
-  {base: 2964, evo: 3739},
-  {base: 2980, evo: 3762},
-  {base: 3009, evo: 3805},
-  {base: 3071, evo: 3369},
-  {base: 3175, evo: 3519},
-  {base: 3177, evo: 3786},
-  {base: 3334, evo: 3814},
-  {base: 3429, evo: 3430},
-  {base: 3680, evo: 3721},
-  {base: 3680, evo: 3816},
-];
+(function () {
+  'use strict';
 
-function updateStorage(key, value, save) {
-  if (save) {
-    localStorage.setItem(key, value);
-  }
-  else {
-    localStorage.removeItem(key);
-  }
-}
+  var STORAGE_KEY = 'optc-legend-progress-v2';
+  var LEGACY_STORAGE_KEYS = ['evohidden'];
+  var LEGEND_POOLS = {
+    'super-sugo': { label: 'Super Sugo', flag: 'superlrr' },
+    anniversary: { label: 'Anniversary', flag: 'annilrr' },
+    kizuna: { label: 'Kizuna', flag: 'kclrr' },
+    'treasure-map': { label: 'Treasure Map', flag: 'tmlrr' },
+    'pirate-festival': { label: 'Pirate Festival', flag: 'pflrr' }
+  };
+  var state = {
+    legends: [],
+    progress: {},
+    filter: 'all',
+    legendPool: 'all',
+    search: '',
+    sort: 'newest',
+    showBaseForms: true
+  };
 
-function readStorageValue(key) {
-  return localStorage.getItem(key);
-}
+  var elements = {};
 
-function readAllStorage() {
-  const nbItem = localStorage.length;
-  const store = [];
-  let i;
-  let storeKey;
-  for (i = 0; i < nbItem; i += 1) {
-    storeKey = localStorage.key(i);
-    store.push({
-      "key" : storeKey,
-      "value" : readStorageValue(storeKey)
-    });
-  }
-  return store;
-}
-
-function updatePage() {
-  //check local storage
-  const store = readAllStorage();
-  //restore the selected class
-  $.each(store, function(index, elem) {
-    if(elem['value'] == 'rainbow')
-      $("#" + elem.key).addClass("rainbow selected");
-    else if(elem['value'] == 'srainbow')
-      $("#" + elem.key).addClass("srainbow selected");
-    else if(elem['value'] == 'hidden')
-      $("#" + elem.key).addClass("disabled");
-    else if (elem['value'] == 'true'){
-      $('.base').toggleClass('hidden');
-      $('#hide-base').css('display', 'none');
-      $('#show-base').css('display', 'inline-block');
-    }
-    else
-      $("#" + elem.key).addClass("selected");
-  });
-}
-
-function selectPage() {
-  var isChecked = document.getElementById('switch').checked;
-  var isChecked2 = document.getElementById('switch2').checked;
-
-  if (isChecked) {
-    $("#special .flair:not(.disabled)").addClass("rainbow");
-    $("#special .flair:not(.disabled)").removeClass("srainbow");
-  }
-  else if (isChecked2) {
-    $("#special .flair:not(.disabled)").addClass("srainbow");
-    $("#special .flair:not(.disabled)").removeClass("rainbow");
-  }
-  else {
-    //adds selected class to every icon
-    $("#special .flair:not(.disabled)").addClass("selected");
-    $("#special .flair:not(.disabled)").removeClass("rainbow");
-    $("#special .flair:not(.disabled)").removeClass("srainbow");
+  function byId(id) {
+    return document.getElementById(id);
   }
 
-
-  var className = document.getElementsByClassName('selected');
-  var idStore = new Array();
-
-
-  //loops every ID and stores key into array
-  for(var i = 0; i < className.length; i++) {
-    idStore.push({"key" : className[i].id, "value" : className[i].className});
+  function clampLlb(value) {
+    var parsed = Number(value);
+    if (!Number.isFinite(parsed)) return 0;
+    return Math.max(0, Math.min(5, Math.round(parsed)));
   }
 
-  //add IDs from array to local storage
-  for(var j=0; j<idStore.length; j++) {
-    if(idStore[j]['value'].includes('srainbow')) {
-      updateStorage(idStore[j]['key'], "srainbow", true);
-    }
-    else if(idStore[j]['value'].includes('rainbow')) {
-      updateStorage(idStore[j]['key'], "rainbow", true);
-    }
-    else {
-      updateStorage(idStore[j]['key'], null, true);
+  function defaultProgress() {
+    return { owned: false, rainbow: false, llb: 0 };
+  }
+
+  function normaliseProgressEntry(entry) {
+    var next = defaultProgress();
+    if (!entry || typeof entry !== 'object') return next;
+    next.owned = Boolean(entry.owned || entry.rainbow || Number(entry.llb) > 0);
+    next.rainbow = Boolean(entry.rainbow);
+    next.llb = clampLlb(entry.llb);
+    return next;
+  }
+
+  function readSavedProgress() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+
+      return Object.keys(parsed).reduce(function (all, id) {
+        all[id] = normaliseProgressEntry(parsed[id]);
+        return all;
+      }, {});
+    } catch (error) {
+      return null;
     }
   }
-}
 
-function resetPage() {
-  //check local storage
-  const store = readAllStorage();
-  //delete the selected class
-  $.each(store, function(index, elem) {
-    $("#" + elem.key).removeClass("selected");
-    $("#" + elem.key).removeClass("rainbow");
-    $("#" + elem.key).removeClass("srainbow");
-    $("#" + elem.key).removeClass("disabled");
-  });
-  //clears local storage
-  localStorage.clear();
-  $('#show-hidden').html('Unhide All Removed Legends (' + $('.disabled').length + ')');
-}
+  function readSharedProgress() {
+    var hash = window.location.hash.replace(/^#/, '');
+    if (!hash) return null;
 
-//unique legend tracker
-function countLegends() {
-  var disabled = $('.disabled');
-  var unique = $('#special .flair:not(.base)');
+    var params = new URLSearchParams(hash);
+    var encoded = params.get('progress');
+    if (!encoded) return null;
 
-  var selected = $('.selected');
-  var pairs = [];
-  var baseArray = [];
-  var disabledArray = [];
-
-  //maps evos with base
-  var baseMap = base.reduce(function(map, obj) {
-      map[obj.evo] = obj.base;
-      return map;
-  }, {});
-
-  //pushes IDs to new array
-  for(var i = 0; i < selected.length; i++) {
-    pairs.push(selected[i].id);
-  }
-
-  for(var k = 0; k < base.length; k++) {
-    baseArray.push(base[k]['base']);
-    baseArray.push(base[k]['evo']);
-  }
-
-  //push IDs to disabled array to pass as argument later
-  for(var j = 0; j < disabled.length; j++) {
-    if(baseArray.includes(parseInt(disabled[j].id)))
-      disabledArray.push(disabled[j].id);
-  }
-
-  //creates new set and returns size
-  function countUnique(arg) {
-    return new Set(arg.map (x => baseMap.hasOwnProperty(x)? baseMap[x].toString() : x)).size;
-  }
-  //subtracting 1 from total to account for log luffy stuff?
-  $('#counter').html("<span class='cl'>Unique Legends - </span>" + countUnique(pairs) + "/" + (countUnique(unique) - (disabled.length - countUnique(disabledArray)) - 1));
-  countLegends2();
-}
-
-//total legend tracker
-function countLegends2() {
-  var amount = $(".selected").length;
-  var total = $("#special .flair").length;
-  var disabled = $('.disabled').length;
-
-  $('#counter2').html("<span class='cl'>Total Legends - </span>" + amount + "/" + (total-disabled));
-  countRainbows();
-  countSrainbows();
-}
-
-//rainbow tracker
-function countRainbows() {
-  var amount = $(".rainbow").length;
-  var amount2 = $(".srainbow").length;
-  var total = $("#special .flair").length;
-  var disabled = $('.disabled').length;
-
-  $('#rainbow').html("<span class='cl'>Rainbowed - </span>" + (amount + amount2) + "/" + (total-disabled));
-}
-
-//super rainbow tracker
-function countSrainbows() {
-  var amount = $(".srainbow").length;
-  var total = $("#special .flair").length;
-  var disabled = $('.disabled').length;
-
-  $('#srainbow').html("<span class='cl'>Super Rainbowed - </span>" + amount + "/" + (total-disabled));
-}
-
-//un-hides all hidden legends
-function showHidden() {
-  var disabled = $(".disabled");
-
-  for(var i = 0; i < disabled.length; i++) {
-    localStorage.removeItem(disabled[i].id);
-  }
-  $(".disabled").toggleClass("disabled");
-  $('#show-hidden').html('Unhide All Removed Legends (' + $('.disabled').length + ')');
-}
-
-//unhides specific Legends
-function listHidden() {
-  toggleModal2();
-  $(".modal-content2").empty();
-  $("#switch").prop("checked", false);
-  $("#switch2").prop("checked", false);
-  $("#hide-legends").prop("checked", false);
-
-  var disabled = $(".disabled")
-  var box = $('.modal-content2');
-
-  //creates new images for hidden legends
-  for(var i = 0; i < disabled.length; i++) {
-    var flair = document.createElement('img');
-    flair.setAttribute('class', 'flair');
-    flair.setAttribute('name', disabled[i].firstChild.id);
-    flair.setAttribute('crossorigin', 'anonymous');
-    flair.setAttribute('src', getLegendIconUrl(disabled[i].firstChild.id));
-
-    box.append(flair);
-  }
-
-  //unhide legends in checklist when clicked
-  $(".modal-content2 img").mousedown(function(e) {
-    const $obj = $(this);
-    var id = $obj[0].name;
-    $("#"+id).parent().removeClass('disabled');
-    //removes from modal display
-    $obj.hide();
-    //removes from local storage
-    localStorage.removeItem(id);
-    //updates counters
-    $('#show-hidden').html('Unhide All Removed Legends (' + $('.disabled').length + ')');
-    countLegends();
-  });
-}
-
-//toggles popup window
-function toggleModal() {
-
-  let modal = document.querySelector(".modal")
-  let closeBtn = document.querySelector(".close-btn")
-
-  modal.style.display = "block"
-
-  closeBtn.onclick = function(){
-    modal.style.display = "none"
-  }
-  window.onclick = function(e){
-    if(e.target == modal){
-      modal.style.display = "none"
+    try {
+      var decoded = window.LZString && window.LZString.decompressFromEncodedURIComponent
+        ? window.LZString.decompressFromEncodedURIComponent(encoded)
+        : decodeURIComponent(encoded);
+      return decoded ? parseImportedProgress(decoded) : null;
+    } catch (error) {
+      return null;
     }
   }
-}
 
-//toggles 2nd popup window
-function toggleModal2() {
+  function migrateLegacyProgress() {
+    var migrated = {};
+    var found = false;
 
-  let modal = document.querySelector(".modal2")
-  let closeBtn = document.querySelector(".close-btn2")
+    Object.keys(localStorage).forEach(function (key) {
+      if (LEGACY_STORAGE_KEYS.indexOf(key) !== -1 || !/^\d+$/.test(key)) return;
 
-  modal.style.display = "block"
+      var value = localStorage.getItem(key);
+      if (value === 'hidden') return;
 
-  closeBtn.onclick = function(){
-    modal.style.display = "none"
-  }
-  window.onclick = function(e){
-    if(e.target == modal){
-      modal.style.display = "none"
-    }
-  }
-}
+      var entry = defaultProgress();
+      if (value === 'rainbow' || value === 'srainbow') {
+        entry.owned = true;
+        entry.rainbow = true;
+      } else if (value === 'null' || value === null || value === '') {
+        entry.owned = true;
+      } else {
+        return;
+      }
 
-//toggles 3rd popup window
-function toggleModal3() {
-
-  let modal = document.querySelector(".modal3")
-  let closeBtn = document.querySelector(".close-btn3")
-
-  modal.style.display = "block"
-
-  closeBtn.onclick = function(){
-    modal.style.display = "none"
-  }
-  window.onclick = function(e){
-    if(e.target == modal){
-      modal.style.display = "none"
-    }
-  }
-}
-
-function windowOnClick(event) {
-  var modal = document.querySelector(".modal");
-   if (event.target === modal) {
-       toggleModal();
-   }
-}
-
-//export image function
-function generateImage() {
-  toggleModal();
-
-  $(".modal-content").empty();
-
-  domtoimage.toSvg($('.icon-container')[0]).then(function (dataUrl) {
-          var img = new Image();
-          img.src = dataUrl;
-          $(".modal-content").append(img);
-  });
-}
-
-
-//download feature
-function download() {
-  domtoimage.toBlob($('.icon-container')[0]).then(function (blob) {
-        window.saveAs(blob, 'checklist.jpg');
-    });
-}
-
-//export localStorage
-function exportSelection() {
-  $('#import-text').attr("style", "opacity: 0; z-index: -1;");
-  $('#apply-import').attr("style", "opacity: 0; z-index: -1;");
-  $('#copy-export').attr("style", "opacity: 1; z-index: 1;");
-  var raw = JSON.stringify(localStorage);
-  container = document.getElementById("export-text");
-  container.setAttribute("style", "transform: translateY(0); opacity: 1; z-index: 1;");
-  container.value = LZString.compressToEncodedURIComponent(raw);
-}
-
-//copy exported data
-function copySelection() {
-  container = document.getElementById("export-text");
-  container.select();
-  document.execCommand("copy");
-  $('#display-copied').fadeIn().delay(1000).fadeOut();
-}
-
-//import button
-function toggleImport() {
-  $('#export-text').attr("style", "opacity: 0; z-index: -1;");
-  $('#copy-export').attr("style", "opacity: 0; z-index: -1;");
-  $('#apply-import').attr("style", "opacity: 1; z-index: 1;");
-  $("#import-text").attr("style", "transform: translateY(0); opacity: 1; z-index: 1;");
-}
-
-//apply imported data
-function importSelection() {
-  var text = document.getElementById("import-text").value;
-
-  plaintext = LZString.decompressFromEncodedURIComponent(text);
-
-  //clears local storage
-  localStorage.clear();
-
-  try {
-    // Convert to a JSON object
-    data = JSON.parse(plaintext);
-
-    console.log(data);
-
-    // Iterate over the JSON object and save to localstorage
-    Object.keys(data).map(function(key, index) {
-        var value = data[key];
-        localStorage.setItem(key, value);
+      migrated[key] = entry;
+      found = true;
     });
 
-    $('#imported').fadeIn().delay(1000).fadeOut();
-  }
-  //if error
-  catch {
-    $('#undefined').fadeIn().delay(1000).fadeOut();
+    return found ? migrated : {};
   }
 
-  //restore previous state
-  updatePage();
-
-  //legend counter
-  countLegends();
-}
-
-jQuery(document).ready(function($) {
-  if (window.optcDbBasePairs && window.optcDbBasePairs.length) {
-    base = window.optcDbBasePairs;
+  function loadProgress() {
+    var sharedProgress = readSharedProgress();
+    state.progress = sharedProgress || readSavedProgress() || migrateLegacyProgress();
+    if (sharedProgress) saveProgress();
   }
 
-  //adds base class to pre-defined elements
- 
- 
-  for(var v in base) {
-    var item = document.getElementById(base[v]['base']);
-
-    $(item).addClass('base');
+  function saveProgress() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
+    } catch (error) {
+      setFeedback('Your browser could not save this change.');
+    }
   }
 
-  //restore previous state
-  updatePage();
+  function getProgress(id) {
+    if (!state.progress[id]) state.progress[id] = defaultProgress();
+    return state.progress[id];
+  }
 
-  //legend counter
-  countLegends();
-
-  //restores hidden legend counter upon page load - must be placed under updatePage()
-  $('#show-hidden').html('Unhide All Removed Legends (' + $('.disabled').length + ')');
-
-  //makes sure only one toggle can be flipped at a time
-  $("#switch").on("change", function(){
-    $("#hide-legends").prop("checked", false);
-    $("#switch2").prop("checked", false);
-  });
-
-  $("#switch2").on("change", function(){
-    $("#hide-legends").prop("checked", false);
-    $("#switch").prop("checked", false);
-  });
-
-  $("#hide-legends").on("change", function(){
-    $("#switch").prop("checked", false);
-    $("#switch2").prop("checked", false);
-  });
-
-  //main function for selecting icons
-  $("#special img").mousedown(function(e) {
-    var isChecked = document.getElementById('switch').checked;
-    var isChecked2 = document.getElementById('hide-legends').checked;
-    var isChecked3 = document.getElementById('switch2').checked;
-    var isChecked4 = document.getElementById('check4').checked;
-    var isChecked4 = document.getElementById('check4').checked;
-    const $obj = $(this);
-
-
-    const level_text = $obj[0].parentElement.getElementsByClassName('flair-level')[0]
-
-    //rainbow toggle must be checked
-    if(isChecked) {
-      if($obj.hasClass("selected")) {
-        $obj.toggleClass('rainbow');
-        $obj.removeClass('srainbow');
+  function compactProgress() {
+    Object.keys(state.progress).forEach(function (id) {
+      var progress = normaliseProgressEntry(state.progress[id]);
+      if (!progress.owned && !progress.rainbow && !progress.llb) {
+        delete state.progress[id];
+      } else {
+        state.progress[id] = progress;
       }
-      else {
-        $obj.toggleClass('rainbow selected');
-      }
+    });
+  }
 
-      //creates object if selected class is present
-      const save = $obj.hasClass("selected");
-      var rainbow = $obj.hasClass("rainbow");
+  function legendName(id) {
+    var unit = window.units && window.units[id];
+    return unit && unit.name ? String(unit.name) : 'Legend #' + id;
+  }
 
-      //updates the storage value accordingly
-      if(rainbow) {
-        updateStorage($obj.attr("id"), "rainbow", save);
-      }
-      else {
-        updateStorage($obj.attr("id"), null, save);
-      }
-      countLegends();
+  function legendType(id) {
+    var unit = window.units && window.units[id];
+    return unit && unit.type ? String(unit.type) : 'LEG';
+  }
+
+  function getLegendPools(id) {
+    var flags = window.flags && window.flags[id] ? window.flags[id] : {};
+    return Object.keys(LEGEND_POOLS).reduce(function (pools, pool) {
+      if (flags[LEGEND_POOLS[pool].flag]) pools[pool] = true;
+      return pools;
+    }, {});
+  }
+
+  function getBaseIds(ids) {
+    var pairs = window.getLegendBasePairs ? window.getLegendBasePairs(ids) : [];
+    return (pairs || []).reduce(function (all, pair) {
+      all[String(pair.base)] = true;
+      return all;
+    }, {});
+  }
+
+  function loadLegends() {
+    var ids = window.getLegendIds ? window.getLegendIds() : [];
+    var pairs = window.getLegendBasePairs ? window.getLegendBasePairs(ids) : [];
+    var orderedIds = window.orderLegendIds ? window.orderLegendIds(ids, pairs) : ids;
+    var baseIds = getBaseIds(ids);
+
+    state.legends = orderedIds.map(function (id) {
+      return {
+        id: Number(id),
+        name: legendName(id),
+        type: legendType(id),
+        pools: getLegendPools(id),
+        isBaseForm: Boolean(baseIds[String(id)]),
+        image: window.getLegendIconUrl ? window.getLegendIconUrl(id) : 'images/icons/' + id + '.png'
+      };
+    });
+  }
+
+  function listVisibleLegends() {
+    var search = state.search.trim().toLocaleLowerCase();
+    var legends = state.legends.filter(function (legend) {
+      var progress = getProgress(legend.id);
+      if (!state.showBaseForms && legend.isBaseForm) return false;
+      if (state.filter === 'owned' && !progress.owned) return false;
+      if (state.filter === 'rainbow' && !progress.rainbow) return false;
+      if (state.filter === 'llb' && !progress.llb) return false;
+      if (state.legendPool !== 'all' && !legend.pools[state.legendPool]) return false;
+      if (!search) return true;
+      return legend.name.toLocaleLowerCase().indexOf(search) !== -1 || String(legend.id).indexOf(search) !== -1;
+    });
+
+    return legends.sort(function (a, b) {
+      if (state.sort === 'oldest') return a.id - b.id;
+      if (state.sort === 'name') return a.name.localeCompare(b.name);
+      return b.id - a.id;
+    });
+  }
+
+  function getCollectionTotals() {
+    var total = state.legends.length;
+    var owned = 0;
+    var rainbow = 0;
+    var maxLlb = 0;
+
+    state.legends.forEach(function (legend) {
+      var progress = getProgress(legend.id);
+      if (progress.owned) owned += 1;
+      if (progress.rainbow) rainbow += 1;
+      if (progress.llb === 5) maxLlb += 1;
+    });
+
+    return { total: total, owned: owned, rainbow: rainbow, maxLlb: maxLlb };
+  }
+
+  function updateCounters() {
+    var totals = getCollectionTotals();
+    var total = totals.total;
+    var owned = totals.owned;
+    var rainbow = totals.rainbow;
+    var maxLlb = totals.maxLlb;
+
+    setText(elements.ownedCount, owned, total);
+    setText(elements.rainbowCount, rainbow, total);
+    setText(elements.llbCount, maxLlb, total);
+    elements.ownedMeter.style.width = percentage(owned, total) + '%';
+    elements.rainbowMeter.style.width = percentage(rainbow, total) + '%';
+    elements.llbMeter.style.width = percentage(maxLlb, total) + '%';
+  }
+
+  function setText(element, value, total) {
+    element.innerHTML = value + ' <small>/ ' + total + '</small>';
+  }
+
+  function percentage(value, total) {
+    return total ? Math.round((value / total) * 100) : 0;
+  }
+
+  function updateCard(card, legend) {
+    var progress = getProgress(legend.id);
+    var portrait = card.querySelector('[data-action="owned"]');
+    var image = card.querySelector('.legend-art');
+    var ownedBadge = card.querySelector('.owned-badge');
+    var llbBadge = card.querySelector('.llb-badge');
+    var type = card.querySelector('.legend-type');
+    var id = card.querySelector('.legend-id');
+    var name = card.querySelector('.legend-name');
+    var rainbow = card.querySelector('[data-action="rainbow"]');
+    var llb = card.querySelector('[data-action="llb"]');
+
+    card.dataset.id = legend.id;
+    card.classList.toggle('is-owned', progress.owned);
+    card.classList.toggle('is-rainbow', progress.rainbow);
+    card.classList.toggle('has-llb', progress.llb > 0);
+    portrait.setAttribute('aria-pressed', String(progress.owned));
+    portrait.setAttribute('aria-label', (progress.owned ? 'Remove ' : 'Add ') + legend.name + (progress.owned ? ' from owned legends' : ' to owned legends'));
+    image.src = legend.image;
+    image.alt = legend.name;
+    image.onerror = function () { this.src = 'images/icons/' + legend.id + '.png'; };
+    ownedBadge.textContent = progress.owned ? 'Owned' : 'Not owned';
+    llbBadge.hidden = progress.llb === 0;
+    llbBadge.textContent = 'LLB ' + progress.llb + '/5';
+    type.textContent = legend.type;
+    id.textContent = '#' + legend.id;
+    name.textContent = legend.name;
+    rainbow.setAttribute('aria-pressed', String(progress.rainbow));
+    rainbow.setAttribute('aria-label', (progress.rainbow ? 'Remove rainbow status from ' : 'Mark ') + legend.name + (progress.rainbow ? '' : ' as rainbowed'));
+    llb.value = String(progress.llb);
+  }
+
+  function buildCard(legend) {
+    var card = elements.template.content.firstElementChild.cloneNode(true);
+    updateCard(card, legend);
+    return card;
+  }
+
+  function renderGrid() {
+    var visible = listVisibleLegends();
+    var fragment = document.createDocumentFragment();
+    elements.grid.innerHTML = '';
+
+    if (!visible.length) {
+      var empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = '<strong>No legends found.</strong>Try a different search or filter.';
+      elements.grid.appendChild(empty);
+    } else {
+      visible.forEach(function (legend) { fragment.appendChild(buildCard(legend)); });
+      elements.grid.appendChild(fragment);
     }
-    //hide legends toggle
-    else if(isChecked2){
-      $obj.parent().toggleClass("disabled");
-      $obj.removeClass("rainbow");
-      $obj.removeClass("srainbow");
-      $obj.removeClass("selected");
 
-      const save = $obj.hasClass("disabled");
+    elements.visibleCount.textContent = visible.length + ' of ' + state.legends.length + ' legends shown';
+    updateCounters();
+  }
 
-      updateStorage($obj.attr("id"), "hidden", save);
-      countLegends();
+  function updateLegendPoolOptions() {
+    Array.prototype.forEach.call(elements.legendPool.options, function (option) {
+      var pool = option.value;
+      var count = pool === 'all'
+        ? state.legends.length
+        : state.legends.filter(function (legend) { return legend.pools[pool]; }).length;
+      var label = pool === 'all' ? 'All legends' : LEGEND_POOLS[pool].label;
+      option.textContent = label + ' (' + count + ')';
+      option.disabled = pool !== 'all' && count === 0;
+    });
+  }
 
-      //shows counter of hidden legends
-      $('#show-hidden').html('Unhide All Removed Legends (' + $('.disabled').length + ')');
+  function persistAndRender() {
+    compactProgress();
+    saveProgress();
+    renderGrid();
+  }
+
+  function onGridClick(event) {
+    var action = event.target.closest('[data-action]');
+    if (!action || action.tagName === 'SELECT') return;
+    var card = action.closest('.legend-card');
+    if (!card) return;
+    var id = card.dataset.id;
+    var progress = getProgress(id);
+
+    if (action.dataset.action === 'owned') {
+      progress.owned = !progress.owned;
+      if (!progress.owned) {
+        progress.rainbow = false;
+        progress.llb = 0;
+      }
     }
-    //super rainbow toggle
-    else if(isChecked3){
-      if($obj.hasClass("selected")) {
-        $obj.toggleClass('srainbow');
-        $obj.removeClass('rainbow');
-      }
-      else {
-        $obj.toggleClass('srainbow selected');
-      }
 
-      //creates object if selected class is present
-      const save = $obj.hasClass("selected");
-      var srainbow = $obj.hasClass("srainbow");
-
-      //updates the storage value accordingly
-      if(srainbow) {
-        updateStorage($obj.attr("id"), "srainbow", save);
-      }
-      else {
-        updateStorage($obj.attr("id"), null, save);
-      }
-      countLegends();
+    if (action.dataset.action === 'rainbow') {
+      progress.rainbow = !progress.rainbow;
+      if (progress.rainbow) progress.owned = true;
     }
-    else if(isChecked4){
-      if(level_text.textContent == '0') {
-        level_text.textContent = '1'
-      }else if(level_text.textContent == '1') {
-        level_text.textContent = '2'}
-      else if(level_text.textContent == '2') {
-        level_text.textContent = '3'}
-      else if(level_text.textContent == '3') {
-        level_text.textContent = '4'}
-      else if(level_text.textContent == '4') {
-        level_text.textContent = '5'}
-      else if(level_text.textContent == '5') {
-        level_text.textContent = '0'
+
+    persistAndRender();
+  }
+
+  function onGridChange(event) {
+    var select = event.target.closest('select[data-action="llb"]');
+    if (!select) return;
+    var card = select.closest('.legend-card');
+    if (!card) return;
+    var progress = getProgress(card.dataset.id);
+    progress.llb = clampLlb(select.value);
+    if (progress.llb > 0) progress.owned = true;
+    persistAndRender();
+  }
+
+  function chooseFilter(event) {
+    var button = event.target.closest('[data-filter]');
+    if (!button) return;
+    state.filter = button.dataset.filter;
+    document.querySelectorAll('[data-filter]').forEach(function (item) {
+      item.classList.toggle('is-active', item === button);
+    });
+    renderGrid();
+  }
+
+  function resetProgress() {
+    if (!window.confirm('Reset all ownership, Rainbow, and LLB progress saved in this browser?')) return;
+    state.progress = {};
+    saveProgress();
+    renderGrid();
+  }
+
+  function serialiseProgress() {
+    compactProgress();
+    return JSON.stringify({ version: 2, progress: state.progress });
+  }
+
+  function setFeedback(message) {
+    if (elements.feedback) elements.feedback.textContent = message;
+  }
+
+  function openBackup() {
+    openDialog('export');
+  }
+
+  function openShare() {
+    openDialog('share');
+  }
+
+  function openDialog(view) {
+    elements.exportData.value = serialiseProgress();
+    elements.shareLink.value = createShareUrl();
+    setTransferView(view);
+    elements.backupDialog.showModal();
+  }
+
+  function setTransferView(view) {
+    elements.exportView.hidden = view !== 'export';
+    elements.importView.hidden = view !== 'import';
+    elements.shareView.hidden = view !== 'share';
+    if (view === 'share') elements.shareLink.value = createShareUrl();
+    document.querySelectorAll('[data-transfer-view]').forEach(function (button) {
+      button.classList.toggle('is-active', button.dataset.transferView === view);
+    });
+    setFeedback('');
+  }
+
+  function createShareUrl() {
+    var payload = serialiseProgress();
+    var encoded = window.LZString && window.LZString.compressToEncodedURIComponent
+      ? window.LZString.compressToEncodedURIComponent(payload)
+      : encodeURIComponent(payload);
+    return window.location.origin + window.location.pathname + '#progress=' + encoded;
+  }
+
+  function copyText(text, input, successMessage) {
+    function success() { setFeedback(successMessage); }
+    function fallback() {
+      input.focus();
+      input.select();
+      try {
+        document.execCommand('copy');
+        success();
+      } catch (error) {
+        setFeedback('Select and copy the backup text manually.');
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(success).catch(fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function copyBackup() {
+    copyText(elements.exportData.value, elements.exportData, 'Backup copied.');
+  }
+
+  function copyShareLink() {
+    copyText(elements.shareLink.value, elements.shareLink, 'Share link copied.');
+  }
+
+  function nativeShareLink() {
+    var url = elements.shareLink.value;
+    if (!navigator.share) {
+      copyShareLink();
+      return;
+    }
+
+    navigator.share({
+      title: 'My OPTC Legend Locker',
+      text: 'Check out my OPTC legend collection.',
+      url: url
+    }).then(function () {
+      setFeedback('Share sheet opened.');
+    }).catch(function (error) {
+      if (error && error.name !== 'AbortError') copyShareLink();
+    });
+  }
+
+  function roundedRect(context, x, y, width, height, radius) {
+    var safeRadius = Math.min(radius, width / 2, height / 2);
+    context.beginPath();
+    context.moveTo(x + safeRadius, y);
+    context.lineTo(x + width - safeRadius, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+    context.lineTo(x + width, y + height - safeRadius);
+    context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+    context.lineTo(x + safeRadius, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+    context.lineTo(x, y + safeRadius);
+    context.quadraticCurveTo(x, y, x + safeRadius, y);
+    context.closePath();
+  }
+
+  function loadExportImage(legend) {
+    return new Promise(function (resolve) {
+      function loadFallback() {
+        var fallback = new Image();
+        fallback.onload = function () { resolve(fallback); };
+        fallback.onerror = function () { resolve(null); };
+        fallback.src = 'images/icons/' + legend.id + '.png';
       }
 
+      var image = new Image();
+      image.crossOrigin = 'anonymous';
+      image.onload = function () { resolve(image); };
+      image.onerror = loadFallback;
+      image.src = legend.image;
+    });
+  }
+
+  function drawExportStat(context, label, value, x, y) {
+    context.fillStyle = '#aebadd';
+    context.font = '600 22px system-ui, sans-serif';
+    context.fillText(label, x, y);
+    context.fillStyle = '#f4f6ff';
+    context.font = '800 34px system-ui, sans-serif';
+    context.fillText(value, x, y + 39);
+  }
+
+  function rainbowStroke(context, x, y, size) {
+    var gradient = context.createLinearGradient(x, y, x + size, y + size);
+    gradient.addColorStop(0, '#ff7399');
+    gradient.addColorStop(0.2, '#ffa66c');
+    gradient.addColorStop(0.38, '#ffe46b');
+    gradient.addColorStop(0.55, '#62edc8');
+    gradient.addColorStop(0.73, '#69a9ff');
+    gradient.addColorStop(0.89, '#c489ff');
+    gradient.addColorStop(1, '#ff7399');
+    context.strokeStyle = gradient;
+    context.lineWidth = 4;
+    context.strokeRect(x + 2, y + 2, size - 4, size - 4);
+  }
+
+  function renderCollectionCanvas() {
+    var totals = getCollectionTotals();
+    var legends = state.legends.slice().sort(function (a, b) { return b.id - a.id; });
+    var columns = 20;
+    var width = 1600;
+    var padding = 38;
+    var gap = 6;
+    var headerHeight = 158;
+    var tileSize = Math.floor((width - (padding * 2) - (gap * (columns - 1))) / columns);
+    var rows = Math.ceil(legends.length / columns);
+    var height = headerHeight + padding + (rows * tileSize) + ((rows - 1) * gap) + 50;
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+
+    canvas.width = width;
+    canvas.height = height;
+
+    var background = context.createLinearGradient(0, 0, width, height);
+    background.addColorStop(0, '#111d47');
+    background.addColorStop(0.6, '#0a102b');
+    background.addColorStop(1, '#05091a');
+    context.fillStyle = background;
+    context.fillRect(0, 0, width, height);
+
+    var glow = context.createRadialGradient(width - 170, 40, 5, width - 170, 40, 360);
+    glow.addColorStop(0, 'rgba(155, 113, 255, 0.28)');
+    glow.addColorStop(1, 'rgba(155, 113, 255, 0)');
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, headerHeight + 70);
+
+    roundedRect(context, padding, 34, 78, 34, 8);
+    context.fillStyle = '#7656ce';
+    context.fill();
+    context.fillStyle = '#f2efff';
+    context.font = '800 17px system-ui, sans-serif';
+    context.fillText('OPTC', padding + 10, 57);
+    context.fillStyle = '#f0f3ff';
+    context.font = '800 33px system-ui, sans-serif';
+    context.fillText('legend locker', padding + 95, 60);
+    context.fillStyle = '#b6c2e1';
+    context.font = '500 19px system-ui, sans-serif';
+    context.fillText('Legend collection • ' + new Date().toLocaleDateString(), padding, 98);
+
+    drawExportStat(context, 'Owned', totals.owned + ' / ' + totals.total, width - 440, 46);
+    drawExportStat(context, 'Rainbow', totals.rainbow + ' / ' + totals.total, width - 285, 46);
+    drawExportStat(context, 'LLB 5', totals.maxLlb + ' / ' + totals.total, width - 130, 46);
+    context.fillStyle = 'rgba(166, 185, 232, 0.25)';
+    context.fillRect(padding, 128, width - (padding * 2), 1);
+
+    return Promise.all(legends.map(loadExportImage)).then(function (images) {
+      legends.forEach(function (legend, index) {
+        var progress = getProgress(legend.id);
+        var image = images[index];
+        var column = index % columns;
+        var row = Math.floor(index / columns);
+        var x = padding + (column * (tileSize + gap));
+        var y = headerHeight + (row * (tileSize + gap));
+
+        roundedRect(context, x, y, tileSize, tileSize, 5);
+        context.fillStyle = '#111a39';
+        context.fill();
+        if (image) {
+          context.save();
+          if (!progress.owned) context.globalAlpha = 0.33;
+          context.drawImage(image, x + 3, y + 3, tileSize - 6, tileSize - 6);
+          context.restore();
+          if (!progress.owned) {
+            context.fillStyle = 'rgba(5, 9, 25, 0.42)';
+            context.fillRect(x + 3, y + 3, tileSize - 6, tileSize - 6);
+          }
+        } else {
+          context.fillStyle = '#7280aa';
+          context.font = '700 16px system-ui, sans-serif';
+          context.fillText('#' + legend.id, x + 6, y + (tileSize / 2));
+        }
+
+        if (progress.rainbow) {
+          rainbowStroke(context, x, y, tileSize);
+        } else if (progress.owned) {
+          context.strokeStyle = 'rgba(112, 229, 170, 0.85)';
+          context.lineWidth = 2;
+          context.strokeRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
+        }
+
+        if (progress.llb > 0) {
+          var badgeSize = Math.max(20, Math.round(tileSize * 0.35));
+          roundedRect(context, x + tileSize - badgeSize - 3, y + tileSize - badgeSize - 3, badgeSize, badgeSize, 4);
+          context.fillStyle = '#7a57d4';
+          context.fill();
+          context.fillStyle = '#fff';
+          context.textAlign = 'center';
+          context.textBaseline = 'middle';
+          context.font = '800 ' + Math.max(12, Math.round(badgeSize * 0.55)) + 'px system-ui, sans-serif';
+          context.fillText(String(progress.llb), x + tileSize - (badgeSize / 2) - 3, y + tileSize - (badgeSize / 2) - 3);
+          context.textAlign = 'start';
+          context.textBaseline = 'alphabetic';
+        }
+      });
+
+      context.fillStyle = '#9faed0';
+      context.font = '500 16px system-ui, sans-serif';
+      context.fillText('Brightness = owned  •  Rainbow border = rainbowed  •  Purple badge = LLB level', padding, height - 20);
+      return canvas;
+    });
+  }
+
+  function downloadBlob(blob, fileName) {
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function canvasToBlob(canvas) {
+    return new Promise(function (resolve, reject) {
+      canvas.toBlob(function (blob) {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error('Unable to create image'));
+        }
+      }, 'image/png');
+    });
+  }
+
+  function generateShareImage() {
+    elements.downloadImage.disabled = true;
+    elements.downloadImage.textContent = 'Building image…';
+    setFeedback('Building your compact collection image…');
+    compactProgress();
+
+    renderCollectionCanvas()
+      .then(canvasToBlob)
+      .then(function (blob) {
+        downloadBlob(blob, 'optc-legend-locker.png');
+        setFeedback('Compact collection image saved.');
+      })
+      .catch(function () {
+        setFeedback('The image could not be created. Try again in a moment.');
+      })
+      .then(function () {
+        elements.downloadImage.disabled = false;
+        elements.downloadImage.textContent = 'Save image';
+      });
+  }
+
+  function parseImportedProgress(raw) {
+    var parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      if (window.LZString && window.LZString.decompressFromEncodedURIComponent) {
+        parsed = JSON.parse(window.LZString.decompressFromEncodedURIComponent(raw));
+      } else {
+        throw error;
+      }
     }
-    //if not checked
-    else {
-      //toggles selected classes
-      $obj.toggleClass("selected");
-      $obj.removeClass("rainbow");
-      $obj.removeClass("srainbow");
 
-      //creates object if selected class is present
-      const save = $obj.hasClass("selected");
+    var source = parsed && parsed.version === 2 && parsed.progress ? parsed.progress : parsed;
+    if (!source || typeof source !== 'object' || Array.isArray(source)) throw new Error('Invalid backup');
 
-      //update the key
-      updateStorage($obj.attr("id"), null, save);
+    return Object.keys(source).reduce(function (all, id) {
+      if (!/^\d+$/.test(id)) return all;
 
-      countLegends();
+      var entry = source[id];
+      if (entry === 'hidden') return all;
+      if (entry === 'rainbow' || entry === 'srainbow') {
+        all[id] = { owned: true, rainbow: true, llb: 0 };
+      } else if (entry === 'null' || entry === null || entry === '') {
+        all[id] = { owned: true, rainbow: false, llb: 0 };
+      } else {
+        all[id] = normaliseProgressEntry(entry);
+      }
+      return all;
+    }, {});
+  }
+
+  function importBackup() {
+    var raw = elements.importData.value.trim();
+    if (!raw) {
+      setFeedback('Paste a backup before importing.');
+      return;
     }
-  });
 
-  //select all button
-  $("#select-all").on("click", function() {
-    selectPage();
-    countLegends();
-  });
+    try {
+      state.progress = parseImportedProgress(raw);
+      saveProgress();
+      renderGrid();
+      elements.importData.value = '';
+      setFeedback('Progress imported successfully.');
+    } catch (error) {
+      setFeedback('That backup could not be read. Please check the text and try again.');
+    }
+  }
 
-  //clear button
-  $("#select-none").on("click", function() {
-    resetPage();
-    countLegends();
-  });
+  function bindEvents() {
+    elements.grid.addEventListener('click', onGridClick);
+    elements.grid.addEventListener('change', onGridChange);
+    elements.search.addEventListener('input', function (event) {
+      state.search = event.target.value;
+      renderGrid();
+    });
+    elements.sort.addEventListener('change', function (event) {
+      state.sort = event.target.value;
+      renderGrid();
+    });
+    elements.legendPool.addEventListener('change', function (event) {
+      state.legendPool = event.target.value;
+      renderGrid();
+    });
+    elements.baseToggle.addEventListener('change', function (event) {
+      state.showBaseForms = event.target.checked;
+      renderGrid();
+    });
+    document.querySelector('.filter-group').addEventListener('click', chooseFilter);
+    elements.resetButton.addEventListener('click', resetProgress);
+    elements.backupButton.addEventListener('click', openBackup);
+    elements.shareButton.addEventListener('click', openShare);
+    elements.copyExport.addEventListener('click', copyBackup);
+    elements.copyShareLink.addEventListener('click', copyShareLink);
+    elements.nativeShareLink.addEventListener('click', nativeShareLink);
+    elements.downloadImage.addEventListener('click', generateShareImage);
+    elements.applyImport.addEventListener('click', importBackup);
+    document.querySelector('.dialog-tabs').addEventListener('click', function (event) {
+      var tab = event.target.closest('[data-transfer-view]');
+      if (tab) setTransferView(tab.dataset.transferView);
+    });
+  }
 
-  //unhide all legends
-  $("#show-hidden").on("click", function() {
-    showHidden();
-    countLegends();
-  });
+  function cacheElements() {
+    elements.grid = byId('legend-grid');
+    elements.template = byId('legend-card-template');
+    elements.search = byId('legend-search');
+    elements.legendPool = byId('legend-pool');
+    elements.sort = byId('sort-order');
+    elements.baseToggle = byId('base-toggle');
+    elements.visibleCount = byId('visible-count');
+    elements.ownedCount = byId('owned-count');
+    elements.rainbowCount = byId('rainbow-count');
+    elements.llbCount = byId('llb-count');
+    elements.ownedMeter = byId('owned-meter');
+    elements.rainbowMeter = byId('rainbow-meter');
+    elements.llbMeter = byId('llb-meter');
+    elements.resetButton = byId('reset-button');
+    elements.backupButton = byId('backup-button');
+    elements.shareButton = byId('share-button');
+    elements.backupDialog = byId('backup-dialog');
+    elements.exportView = byId('export-view');
+    elements.importView = byId('import-view');
+    elements.shareView = byId('share-view');
+    elements.exportData = byId('export-data');
+    elements.importData = byId('import-data');
+    elements.shareLink = byId('share-link');
+    elements.copyExport = byId('copy-export');
+    elements.copyShareLink = byId('copy-share-link');
+    elements.nativeShareLink = byId('native-share-link');
+    elements.downloadImage = byId('download-image');
+    elements.applyImport = byId('apply-import');
+    elements.feedback = byId('transfer-feedback');
+  }
 
-  //unhide specific legends
-  $("#list-hidden").on("click", function() {
-    listHidden();
-    countLegends();
-  });
+  function start() {
+    cacheElements();
+    loadProgress();
+    loadLegends();
+    updateLegendPoolOptions();
+    bindEvents();
+    renderGrid();
+  }
 
-  //hides base forms of legends with super-evos
-  $("#show-base").on("click", function() {
-    $('.base').parent().toggleClass('hidden');
-    console.log($('.base').parent())
-    $('#show-base').css('display', 'none');
-    $('#hide-base').css('display', 'inline-block');
-    updateStorage("evohidden", null, false);
-  });
-
-  //shows base forms of legends with super-evos
-  $("#hide-base").on("click", function() {
-    $('.base').parent().toggleClass('hidden');
-    $('#hide-base').css('display', 'none');
-    $('#show-base').css('display', 'inline-block');
-    updateStorage("evohidden", 'true', true);
-  });
-});
+  document.addEventListener('DOMContentLoaded', start);
+}());

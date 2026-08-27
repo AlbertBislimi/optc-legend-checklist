@@ -330,40 +330,9 @@ function orderLegendIds(legendIds, basePairs) {
 	return ordered;
 }
 
-loadPage = function() {
-
-	var flair_class = '';
-
-	//SPECIAL FLAIRS
-	loadSpecial = function() {
-		var enter = document.getElementById('special');
-
-		var legendIds = getLegendIds();
-		window.optcDbBasePairs = getLegendBasePairs(legendIds);
-		var name = orderLegendIds(legendIds, window.optcDbBasePairs);
-
-		//creates HTML for special flairs
-		for (var v in name) {
-				var flair_wrapper = document.createElement('div');
-				flair_wrapper.classList.add('flair-wrapper');
-				var flair_level = document.createElement('span');
-				flair_level.classList.add('flair-level');
-				flair_level.textContent = '0';
-				flair_wrapper.setAttribute('class', 'flair-wrapper');
-				var flair_special = document.createElement('img');
-				flair_special.setAttribute('class', 'flair level-0');
-				flair_special.setAttribute('id', name[v]);
-				flair_special.setAttribute('alt', window.units && window.units[name[v]] ? window.units[name[v]].name : name[v]);
-				flair_special.setAttribute('title', window.units && window.units[name[v]] ? window.units[name[v]].name : name[v]);
-				flair_special.setAttribute('crossorigin', 'anonymous');
-				flair_special.setAttribute('src', getLegendIconUrl(name[v]));
-				flair_wrapper.appendChild(flair_special);
-				flair_wrapper.appendChild(flair_level);
-				enter.appendChild(flair_wrapper);
-		}
-	}
-	loadSpecial();
-}
-
-//waits for DOM to load before executing function
-document.addEventListener('DOMContentLoaded', loadPage, false);
+// Data helpers are kept in this file so the app can continue using the OPTC
+// database when it is available and fall back to the checked-in legend list.
+window.getLegendIconUrl = getLegendIconUrl;
+window.getLegendIds = getLegendIds;
+window.getLegendBasePairs = getLegendBasePairs;
+window.orderLegendIds = orderLegendIds;
