@@ -113,6 +113,20 @@
     state.progress = sharedProgress || readSavedProgress() || migrateLegacyProgress();
   }
 
+  function syncSharedPreviewFromUrl() {
+    var sharedProgress = readSharedProgress();
+    if (sharedProgress) {
+      state.sharedPreview = true;
+      state.progress = sharedProgress;
+    } else if (state.sharedPreview) {
+      state.sharedPreview = false;
+      state.progress = readSavedProgress() || migrateLegacyProgress();
+    } else {
+      return;
+    }
+    renderGrid();
+  }
+
   function saveProgress() {
     if (state.sharedPreview) return;
     try {
@@ -771,6 +785,7 @@
     elements.downloadImage.addEventListener('click', generateShareImage);
     elements.applyImport.addEventListener('click', importBackup);
     elements.saveSharedCopy.addEventListener('click', saveSharedCopy);
+    window.addEventListener('hashchange', syncSharedPreviewFromUrl);
     document.querySelector('.dialog-tabs').addEventListener('click', function (event) {
       var tab = event.target.closest('[data-transfer-view]');
       if (tab) setTransferView(tab.dataset.transferView);
