@@ -185,13 +185,15 @@
     var baseIds = getBaseIds(ids);
 
     state.legends = orderedIds.map(function (id) {
+      var thumbnail = window.getLegendIconUrl ? window.getLegendIconUrl(id) : 'images/icons/' + id + '.png';
       return {
         id: Number(id),
         name: legendName(id),
         type: legendType(id),
         pools: getLegendPools(id),
         isBaseForm: Boolean(baseIds[String(id)]),
-        image: window.getLegendIconUrl ? window.getLegendIconUrl(id) : 'images/icons/' + id + '.png'
+        image: window.getLegendFullArtUrl ? window.getLegendFullArtUrl(id) : thumbnail,
+        thumbnail: thumbnail
       };
     });
   }
@@ -266,6 +268,7 @@
     var name = card.querySelector('.legend-name');
     var rainbow = card.querySelector('[data-action="rainbow"]');
     var llb = card.querySelector('[data-action="llb"]');
+    var triedThumbnailFallback = false;
 
     card.dataset.id = legend.id;
     card.classList.toggle('is-owned', progress.owned);
@@ -277,7 +280,15 @@
     portrait.setAttribute('aria-label', (progress.owned ? 'Remove ' : 'Add ') + legend.name + (progress.owned ? ' from owned legends' : ' to owned legends'));
     image.src = legend.image;
     image.alt = legend.name;
-    image.onerror = function () { this.src = 'images/icons/' + legend.id + '.png'; };
+    image.onerror = function () {
+      if (!triedThumbnailFallback && legend.thumbnail && legend.thumbnail !== legend.image) {
+        triedThumbnailFallback = true;
+        this.src = legend.thumbnail;
+        return;
+      }
+      this.onerror = null;
+      this.src = 'images/icons/' + legend.id + '.png';
+    };
     ownedBadge.textContent = progress.owned ? 'Owned' : 'Not owned';
     llbBadge.hidden = progress.llb === 0;
     llbBadge.textContent = String(progress.llb);
@@ -531,7 +542,7 @@
       image.crossOrigin = 'anonymous';
       image.onload = function () { resolve(image); };
       image.onerror = loadFallback;
-      image.src = legend.image;
+      image.src = legend.thumbnail || legend.image;
     });
   }
 

@@ -230,6 +230,16 @@ function getLegendIconUrl(id) {
 	return 'images/icons/' + id + '.png';
 }
 
+function getLegendFullArtUrl(id) {
+	if (window.units && window.units[id]) {
+		var paddedId = ('0000' + id).slice(-4);
+		var folder = Math.trunc(id / 1000) + '/' + Math.trunc((id % 1000) / 100) + '00';
+		return OPTC_DB_ROOT + '/api/images/full/transparent/' + folder + '/' + paddedId + '.png';
+	}
+
+	return getLegendIconUrl(id);
+}
+
 function getLegendIds() {
 	if (!window.units || !window.flags) {
 		return fallbackLegendIds;
@@ -333,6 +343,7 @@ function orderLegendIds(legendIds, basePairs) {
 // Data helpers are kept in this file so the app can continue using the OPTC
 // database when it is available and fall back to the checked-in legend list.
 window.getLegendIconUrl = getLegendIconUrl;
+window.getLegendFullArtUrl = getLegendFullArtUrl;
 window.getLegendIds = getLegendIds;
 window.getLegendBasePairs = getLegendBasePairs;
 window.orderLegendIds = orderLegendIds;
