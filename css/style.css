@@ -224,7 +224,8 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
 .llb-badge { position: absolute; z-index: 1; font-size: 9px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 .owned-badge { top: 7px; left: 7px; padding: 4px 5px; color: #9da9c9; border: 1px solid rgba(175, 190, 229, 0.2); border-radius: 5px; background: rgba(4, 8, 24, 0.78); }
 .legend-card.is-owned .owned-badge { color: #b1f7ce; border-color: rgba(112, 229, 170, 0.44); background: rgba(15, 86, 57, 0.86); }
-.llb-badge { top: 7px; right: 7px; padding: 4px 5px; color: #f0e8ff; border: 1px solid rgba(205, 179, 255, 0.54); border-radius: 5px; background: rgba(92, 57, 167, 0.92); box-shadow: 0 3px 10px rgba(55, 25, 121, 0.34); }
+.llb-badge { display: grid; place-items: center; top: 6px; right: 6px; width: 28px; height: 28px; padding: 0; color: #fff; font-size: 13px; font-weight: 900; line-height: 1; letter-spacing: 0; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.76); text-transform: none; border: 2px solid transparent; border-radius: 50%; background: linear-gradient(145deg, #56316f, #160d2b) padding-box, conic-gradient(from -35deg, #ff639e, #ffa861, #fff06c, #69efcc, #6da8ff, #d283ff, #ff639e) border-box; box-shadow: 0 3px 10px rgba(24, 10, 52, 0.62), inset 0 0 0 1px rgba(255, 255, 255, 0.24); }
+.legend-card.is-max-llb .llb-badge { box-shadow: 0 0 0 2px rgba(255, 233, 117, 0.2), 0 3px 13px rgba(129, 78, 231, 0.78), inset 0 0 0 1px rgba(255, 255, 255, 0.32); }
 .legend-type { right: 7px; bottom: 7px; padding: 4px 5px; color: #eef2ff; border-radius: 5px; background: rgba(4, 8, 24, 0.8); }
 
 .legend-details { padding: 9px 9px 10px; }

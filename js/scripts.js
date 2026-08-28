@@ -271,6 +271,7 @@
     card.classList.toggle('is-owned', progress.owned);
     card.classList.toggle('is-rainbow', progress.rainbow);
     card.classList.toggle('has-llb', progress.llb > 0);
+    card.classList.toggle('is-max-llb', progress.llb === 5);
     card.classList.toggle('is-shared-preview', state.sharedPreview);
     portrait.setAttribute('aria-pressed', String(progress.owned));
     portrait.setAttribute('aria-label', (progress.owned ? 'Remove ' : 'Add ') + legend.name + (progress.owned ? ' from owned legends' : ' to owned legends'));
@@ -279,7 +280,9 @@
     image.onerror = function () { this.src = 'images/icons/' + legend.id + '.png'; };
     ownedBadge.textContent = progress.owned ? 'Owned' : 'Not owned';
     llbBadge.hidden = progress.llb === 0;
-    llbBadge.textContent = 'LLB ' + progress.llb + '/5';
+    llbBadge.textContent = String(progress.llb);
+    llbBadge.setAttribute('aria-label', 'Level Limit Break ' + progress.llb + ' of 5');
+    llbBadge.title = 'Level Limit Break ' + progress.llb + ' of 5';
     type.textContent = legend.type;
     id.textContent = '#' + legend.id;
     name.textContent = legend.name;
@@ -555,6 +558,41 @@
     context.strokeRect(x + 2, y + 2, size - 4, size - 4);
   }
 
+  function drawExportLlbBadge(context, x, y, tileSize, level) {
+    var radius = Math.max(11, Math.round(tileSize * 0.19));
+    var centerX = x + tileSize - radius - 4;
+    var centerY = y + radius + 4;
+    var colors = ['#ff649f', '#ffa662', '#fff06c', '#69efcc', '#6ca7ff', '#d183ff'];
+    var slice = (Math.PI * 2) / colors.length;
+
+    context.save();
+    colors.forEach(function (color, index) {
+      context.beginPath();
+      context.moveTo(centerX, centerY);
+      context.arc(centerX, centerY, radius, (index * slice) - (Math.PI / 2), ((index + 1) * slice) - (Math.PI / 2) + 0.03);
+      context.closePath();
+      context.fillStyle = color;
+      context.fill();
+    });
+
+    context.beginPath();
+    context.arc(centerX, centerY, radius - 3, 0, Math.PI * 2);
+    var inner = context.createRadialGradient(centerX - (radius * 0.25), centerY - (radius * 0.3), 1, centerX, centerY, radius);
+    inner.addColorStop(0, '#5d377a');
+    inner.addColorStop(1, '#160e2b');
+    context.fillStyle = inner;
+    context.fill();
+    context.strokeStyle = 'rgba(255, 255, 255, 0.46)';
+    context.lineWidth = 1;
+    context.stroke();
+    context.fillStyle = '#fff';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.font = '900 ' + Math.max(12, Math.round(radius * 1.15)) + 'px system-ui, sans-serif';
+    context.fillText(String(level), centerX, centerY + 0.5);
+    context.restore();
+  }
+
   function renderCollectionCanvas() {
     var totals = getCollectionTotals();
     var legends = state.legends.slice().sort(function (a, b) { return b.id - a.id; });
@@ -640,23 +678,13 @@
         }
 
         if (progress.llb > 0) {
-          var badgeSize = Math.max(20, Math.round(tileSize * 0.35));
-          roundedRect(context, x + tileSize - badgeSize - 3, y + tileSize - badgeSize - 3, badgeSize, badgeSize, 4);
-          context.fillStyle = '#7a57d4';
-          context.fill();
-          context.fillStyle = '#fff';
-          context.textAlign = 'center';
-          context.textBaseline = 'middle';
-          context.font = '800 ' + Math.max(12, Math.round(badgeSize * 0.55)) + 'px system-ui, sans-serif';
-          context.fillText(String(progress.llb), x + tileSize - (badgeSize / 2) - 3, y + tileSize - (badgeSize / 2) - 3);
-          context.textAlign = 'start';
-          context.textBaseline = 'alphabetic';
+          drawExportLlbBadge(context, x, y, tileSize, progress.llb);
         }
       });
 
       context.fillStyle = '#9faed0';
       context.font = '500 16px system-ui, sans-serif';
-      context.fillText('Brightness = owned  •  Rainbow border = rainbowed  •  Purple badge = LLB level', padding, height - 20);
+      context.fillText('Brightness = owned  •  Rainbow border = rainbowed  •  Rainbow badge = LLB level', padding, height - 20);
       return canvas;
     });
   }
