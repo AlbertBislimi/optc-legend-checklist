@@ -14,6 +14,7 @@
     legends: [],
     progress: {},
     sharedPreview: false,
+    view: 'gallery',
     filter: 'all',
     legendPool: 'all',
     search: '',
@@ -311,8 +312,36 @@
     return card;
   }
 
+  function buildGalleryTile(legend) {
+    var tile = elements.galleryTemplate.content.firstElementChild.cloneNode(true);
+    var progress = getProgress(legend.id);
+    var image = tile.querySelector('.gallery-art');
+    var llbBadge = tile.querySelector('.gallery-llb-badge');
+    var status = progress.owned ? 'Owned' : 'Not owned';
+
+    if (progress.rainbow) status += ' · Rainbow';
+    if (progress.llb > 0) status += ' · LLB ' + progress.llb + '/5';
+
+    tile.dataset.id = legend.id;
+    tile.classList.toggle('is-owned', progress.owned);
+    tile.classList.toggle('is-rainbow', progress.rainbow);
+    tile.classList.toggle('has-llb', progress.llb > 0);
+    tile.title = '#' + legend.id + ' · ' + legend.name + ' · ' + status;
+    image.src = legend.thumbnail || legend.image;
+    image.alt = legend.name;
+    image.onerror = function () {
+      this.onerror = null;
+      this.src = 'images/icons/' + legend.id + '.png';
+    };
+    llbBadge.hidden = progress.llb === 0;
+    llbBadge.textContent = String(progress.llb);
+    llbBadge.setAttribute('aria-label', 'Level Limit Break ' + progress.llb + ' of 5');
+    return tile;
+  }
+
   function renderGrid() {
     updateSharedPreview();
+    updateViewMode();
     var visible = listVisibleLegends();
     var fragment = document.createDocumentFragment();
     elements.grid.innerHTML = '';
@@ -323,12 +352,27 @@
       empty.innerHTML = '<strong>No legends found.</strong>Try a different search or filter.';
       elements.grid.appendChild(empty);
     } else {
-      visible.forEach(function (legend) { fragment.appendChild(buildCard(legend)); });
+      visible.forEach(function (legend) {
+        fragment.appendChild(state.view === 'gallery' ? buildGalleryTile(legend) : buildCard(legend));
+      });
       elements.grid.appendChild(fragment);
     }
 
     elements.visibleCount.textContent = visible.length + ' of ' + state.legends.length + ' legends shown';
     updateCounters();
+  }
+
+  function updateViewMode() {
+    var gallery = state.view === 'gallery';
+    elements.grid.classList.toggle('is-gallery', gallery);
+    elements.viewInstruction.innerHTML = gallery
+      ? '<strong>Visual gallery:</strong> scan every legend at a glance. Switch to Manage cards when you want to update Owned, Rainbow, or LLB.'
+      : '<strong>Quick edit:</strong> click a portrait to toggle ownership, then use the controls below it for Rainbow and LLB.';
+    document.querySelectorAll('[data-view]').forEach(function (button) {
+      var active = button.dataset.view === state.view;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
   }
 
   function updateSharedPreview() {
@@ -401,6 +445,13 @@
     document.querySelectorAll('[data-filter]').forEach(function (item) {
       item.classList.toggle('is-active', item === button);
     });
+    renderGrid();
+  }
+
+  function chooseView(event) {
+    var button = event.target.closest('[data-view]');
+    if (!button || button.dataset.view === state.view) return;
+    state.view = button.dataset.view;
     renderGrid();
   }
 
@@ -815,6 +866,7 @@
       renderGrid();
     });
     document.querySelector('.filter-group').addEventListener('click', chooseFilter);
+    document.querySelector('.view-switch').addEventListener('click', chooseView);
     elements.resetButton.addEventListener('click', resetProgress);
     elements.backupButton.addEventListener('click', openBackup);
     elements.shareButton.addEventListener('click', openShare);
@@ -834,6 +886,8 @@
   function cacheElements() {
     elements.grid = byId('legend-grid');
     elements.template = byId('legend-card-template');
+    elements.galleryTemplate = byId('gallery-tile-template');
+    elements.viewInstruction = byId('view-instruction');
     elements.search = byId('legend-search');
     elements.legendPool = byId('legend-pool');
     elements.sort = byId('sort-order');

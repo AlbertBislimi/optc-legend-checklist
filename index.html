@@ -8,14 +8,14 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-llb-medallion">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-visual-gallery">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker-full-art"></script>
-  <script defer src="js/scripts.js?v=legend-locker-full-art"></script>
+  <script defer src="js/scripts.js?v=legend-locker-visual-gallery"></script>
 </head>
 
 <body>
@@ -81,7 +81,7 @@
           <p class="eyebrow">Collection manager</p>
             <h2 id="collection-title">Your legend box</h2>
           </div>
-          <p class="instruction"><strong>Quick edit:</strong> click a portrait to toggle ownership, then use the controls below it for Rainbow and LLB. Share your finished box as a link or image.</p>
+          <p id="view-instruction" class="instruction"><strong>Visual gallery:</strong> scan every legend at a glance. Switch to Manage cards when you want to update Owned, Rainbow, or LLB.</p>
         </div>
 
         <div class="toolbar">
@@ -89,6 +89,11 @@
             <span aria-hidden="true">⌕</span>
             <input id="legend-search" type="search" placeholder="Search a legend" autocomplete="off">
           </label>
+
+          <div class="view-switch" role="group" aria-label="Collection display mode">
+            <button class="view-button is-active" type="button" data-view="gallery" aria-pressed="true">Visual gallery</button>
+            <button class="view-button" type="button" data-view="manage" aria-pressed="false">Manage cards</button>
+          </div>
 
           <div class="filter-group" role="group" aria-label="Legend status filter">
             <button class="filter-button is-active" type="button" data-filter="all">All</button>
@@ -211,6 +216,13 @@
           </label>
         </div>
       </div>
+    </article>
+  </template>
+
+  <template id="gallery-tile-template">
+    <article class="gallery-tile">
+      <img class="gallery-art" alt="" loading="lazy">
+      <span class="gallery-llb-badge" role="img" aria-label="Level Limit Break 0 of 5" hidden>0</span>
     </article>
   </template>
 </body>

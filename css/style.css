@@ -176,10 +176,14 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
 .search-field input { width: 100%; height: 38px; color: var(--ink); font-size: 13px; border: 0; outline: 0; background: transparent; }
 .search-field input::placeholder { color: #657193; }
 
-.filter-group { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: rgba(4, 9, 25, 0.5); }
-.filter-button { min-height: 32px; padding: 5px 10px; color: var(--muted); font-size: 11px; font-weight: 750; border: 0; border-radius: 6px; background: transparent; transition: color 150ms ease, background 150ms ease; }
-.filter-button:hover { color: var(--muted-strong); }
-.filter-button.is-active { color: #eeeaff; background: rgba(130, 92, 232, 0.42); box-shadow: 0 2px 10px rgba(100, 61, 202, 0.18); }
+.filter-group,
+.view-switch { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: rgba(4, 9, 25, 0.5); }
+.filter-button,
+.view-button { min-height: 32px; padding: 5px 10px; color: var(--muted); font-size: 11px; font-weight: 750; border: 0; border-radius: 6px; background: transparent; transition: color 150ms ease, background 150ms ease; }
+.filter-button:hover,
+.view-button:hover { color: var(--muted-strong); }
+.filter-button.is-active,
+.view-button.is-active { color: #eeeaff; background: rgba(130, 92, 232, 0.42); box-shadow: 0 2px 10px rgba(100, 61, 202, 0.18); }
 
 .sort-field { display: flex; align-items: center; gap: 7px; padding: 0 9px; color: var(--muted); font-size: 11px; font-weight: 700; border: 1px solid var(--line); border-radius: 8px; background: rgba(4, 9, 25, 0.5); }
 .sort-field select,
@@ -194,6 +198,17 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
 .base-toggle input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent); cursor: pointer; }
 
 .legend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+.legend-grid.is-gallery { grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }
+
+.gallery-tile { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid rgba(149, 171, 230, 0.16); border-radius: 7px; background: #090e22; box-shadow: 0 5px 12px rgba(1, 3, 15, 0.26); transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease; }
+.gallery-tile:hover { z-index: 1; border-color: rgba(183, 169, 255, 0.56); transform: scale(1.06); box-shadow: 0 10px 18px rgba(1, 3, 15, 0.48); }
+.gallery-tile.is-owned { border-color: rgba(94, 211, 160, 0.64); }
+.gallery-tile.is-rainbow { border-color: transparent; background: linear-gradient(#090e22, #090e22) padding-box, var(--rainbow) border-box; }
+.gallery-art { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(0.86) brightness(0.62); transition: filter 180ms ease, transform 180ms ease; }
+.gallery-tile:hover .gallery-art { transform: scale(1.08); }
+.gallery-tile.is-owned .gallery-art { filter: none; }
+.gallery-tile.is-rainbow .gallery-art { filter: saturate(1.1) contrast(1.05); }
+.gallery-llb-badge { position: absolute; top: 2px; right: 2px; z-index: 1; display: grid; place-items: center; width: 18px; height: 18px; color: #fff; font-size: 9px; font-weight: 900; line-height: 1; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.76); border: 1px solid transparent; border-radius: 50%; background: linear-gradient(145deg, #56316f, #160d2b) padding-box, conic-gradient(from -35deg, #ff639e, #ffa861, #fff06c, #69efcc, #6da8ff, #d283ff, #ff639e) border-box; box-shadow: 0 2px 5px rgba(24, 10, 52, 0.72); }
 
 .legend-card {
   overflow: hidden;
@@ -294,11 +309,14 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
   .instruction { max-width: none; text-align: left; }
   .toolbar { gap: 8px; padding: 8px; }
   .search-field { flex-basis: 100%; }
-  .filter-group { width: 100%; overflow-x: auto; }
-  .filter-button { flex: 1 0 auto; }
+  .filter-group,
+  .view-switch { width: 100%; overflow-x: auto; }
+  .filter-button,
+  .view-button { flex: 1 0 auto; }
   .sort-field { flex: 1; justify-content: space-between; }
   .collection-meta { align-items: flex-start; flex-direction: column; gap: 10px; }
   .legend-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .legend-grid.is-gallery { grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 4px; }
   .image-export { align-items: flex-start; flex-direction: column; }
   .image-export .button { width: 100%; }
 }
