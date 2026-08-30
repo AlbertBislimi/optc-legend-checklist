@@ -8,14 +8,14 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-visual-gallery">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-gallery-edit">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker-full-art"></script>
-  <script defer src="js/scripts.js?v=legend-locker-visual-gallery"></script>
+  <script defer src="js/scripts.js?v=legend-locker-gallery-edit"></script>
 </head>
 
 <body>
@@ -81,7 +81,7 @@
           <p class="eyebrow">Collection manager</p>
             <h2 id="collection-title">Your legend box</h2>
           </div>
-          <p id="view-instruction" class="instruction"><strong>Visual gallery:</strong> scan every legend at a glance. Switch to Manage cards when you want to update Owned, Rainbow, or LLB.</p>
+          <p id="view-instruction" class="instruction"><strong>Visual gallery:</strong> tap a legend to toggle Owned. Long-press on mobile or right-click on desktop to edit Rainbow and LLB.</p>
         </div>
 
         <div class="toolbar">
@@ -185,6 +185,42 @@
         </div>
       </section>
       <p id="transfer-feedback" class="transfer-feedback" role="status"></p>
+    </form>
+  </dialog>
+
+  <dialog id="gallery-editor-dialog" class="gallery-editor-dialog">
+    <form method="dialog" class="dialog-card gallery-editor-card">
+      <div class="dialog-heading gallery-editor-heading">
+        <div class="gallery-editor-legend">
+          <img id="gallery-editor-art" alt="">
+          <div>
+            <p class="eyebrow">Quick edit</p>
+            <h2 id="gallery-editor-name">Legend</h2>
+            <p id="gallery-editor-id" class="gallery-editor-id"></p>
+          </div>
+        </div>
+        <button class="icon-button" value="cancel" type="submit" aria-label="Close quick edit">×</button>
+      </div>
+
+      <div class="gallery-editor-actions" role="group" aria-label="Legend ownership and rainbow status">
+        <button id="gallery-editor-owned" class="gallery-editor-button" type="button" aria-pressed="false">Not owned</button>
+        <button id="gallery-editor-rainbow" class="gallery-editor-button" type="button" aria-pressed="false">Rainbow</button>
+      </div>
+
+      <section class="gallery-editor-llb" aria-labelledby="gallery-editor-llb-label">
+        <div>
+          <p id="gallery-editor-llb-label">Level Limit Break</p>
+          <span>Sets this legend as owned when above 0.</span>
+        </div>
+        <div class="gallery-editor-llb-options" role="group" aria-label="Level Limit Break level">
+          <button type="button" data-gallery-llb="0" aria-pressed="true">0</button>
+          <button type="button" data-gallery-llb="1" aria-pressed="false">1</button>
+          <button type="button" data-gallery-llb="2" aria-pressed="false">2</button>
+          <button type="button" data-gallery-llb="3" aria-pressed="false">3</button>
+          <button type="button" data-gallery-llb="4" aria-pressed="false">4</button>
+          <button type="button" data-gallery-llb="5" aria-pressed="false">5</button>
+        </div>
+      </section>
     </form>
   </dialog>
 

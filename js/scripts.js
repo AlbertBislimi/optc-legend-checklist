@@ -15,6 +15,7 @@
     progress: {},
     sharedPreview: false,
     view: 'gallery',
+    galleryEditId: null,
     filter: 'all',
     legendPool: 'all',
     search: '',
@@ -269,7 +270,6 @@
     var name = card.querySelector('.legend-name');
     var rainbow = card.querySelector('[data-action="rainbow"]');
     var llb = card.querySelector('[data-action="llb"]');
-    var triedThumbnailFallback = false;
 
     card.dataset.id = legend.id;
     card.classList.toggle('is-owned', progress.owned);
@@ -279,14 +279,9 @@
     card.classList.toggle('is-shared-preview', state.sharedPreview);
     portrait.setAttribute('aria-pressed', String(progress.owned));
     portrait.setAttribute('aria-label', (progress.owned ? 'Remove ' : 'Add ') + legend.name + (progress.owned ? ' from owned legends' : ' to owned legends'));
-    image.src = legend.image;
+    image.src = legend.thumbnail || legend.image;
     image.alt = legend.name;
     image.onerror = function () {
-      if (!triedThumbnailFallback && legend.thumbnail && legend.thumbnail !== legend.image) {
-        triedThumbnailFallback = true;
-        this.src = legend.thumbnail;
-        return;
-      }
       this.onerror = null;
       this.src = 'images/icons/' + legend.id + '.png';
     };
@@ -323,6 +318,9 @@
     if (progress.llb > 0) status += ' · LLB ' + progress.llb + '/5';
 
     tile.dataset.id = legend.id;
+    tile.tabIndex = state.sharedPreview ? -1 : 0;
+    tile.setAttribute('role', 'button');
+    tile.setAttribute('aria-label', legend.name + '. ' + status + (state.sharedPreview ? '' : '. Click to toggle ownership. Long-press or right-click for quick edit.'));
     tile.classList.toggle('is-owned', progress.owned);
     tile.classList.toggle('is-rainbow', progress.rainbow);
     tile.classList.toggle('has-llb', progress.llb > 0);
@@ -366,7 +364,7 @@
     var gallery = state.view === 'gallery';
     elements.grid.classList.toggle('is-gallery', gallery);
     elements.viewInstruction.innerHTML = gallery
-      ? '<strong>Visual gallery:</strong> scan every legend at a glance. Switch to Manage cards when you want to update Owned, Rainbow, or LLB.'
+      ? '<strong>Visual gallery:</strong> tap a legend to toggle Owned. Long-press on mobile or right-click on desktop to edit Rainbow and LLB.'
       : '<strong>Quick edit:</strong> click a portrait to toggle ownership, then use the controls below it for Rainbow and LLB.';
     document.querySelectorAll('[data-view]').forEach(function (button) {
       var active = button.dataset.view === state.view;
@@ -381,6 +379,7 @@
     elements.saveNoteText.textContent = state.sharedPreview ? 'Shared preview · not saved' : 'Saved automatically';
     elements.resetButton.disabled = state.sharedPreview;
     elements.resetButton.title = state.sharedPreview ? 'Save a copy before resetting this collection.' : '';
+    if (state.sharedPreview && elements.galleryEditorDialog.open) elements.galleryEditorDialog.close();
   }
 
   function updateLegendPoolOptions() {
@@ -401,29 +400,91 @@
     renderGrid();
   }
 
+  function findLegend(id) {
+    return state.legends.find(function (legend) { return String(legend.id) === String(id); });
+  }
+
+  function toggleLegendOwned(id) {
+    var progress = getProgress(id);
+    progress.owned = !progress.owned;
+    if (!progress.owned) {
+      progress.rainbow = false;
+      progress.llb = 0;
+    }
+    persistAndRender();
+  }
+
+  function toggleLegendRainbow(id) {
+    var progress = getProgress(id);
+    progress.rainbow = !progress.rainbow;
+    if (progress.rainbow) progress.owned = true;
+    persistAndRender();
+  }
+
+  function setLegendLlb(id, value) {
+    var progress = getProgress(id);
+    progress.llb = clampLlb(value);
+    if (progress.llb > 0) progress.owned = true;
+    persistAndRender();
+  }
+
+  function updateGalleryEditor() {
+    var legend = findLegend(state.galleryEditId);
+    if (!legend) return;
+    var progress = getProgress(legend.id);
+
+    elements.galleryEditorArt.src = legend.thumbnail || legend.image;
+    elements.galleryEditorArt.alt = legend.name;
+    elements.galleryEditorArt.onerror = function () {
+      this.onerror = null;
+      this.src = 'images/icons/' + legend.id + '.png';
+    };
+    elements.galleryEditorName.textContent = legend.name;
+    elements.galleryEditorId.textContent = '#' + legend.id + ' · ' + legend.type;
+    elements.galleryEditorOwned.textContent = progress.owned ? 'Owned' : 'Not owned';
+    elements.galleryEditorOwned.classList.toggle('is-active', progress.owned);
+    elements.galleryEditorOwned.setAttribute('aria-pressed', String(progress.owned));
+    elements.galleryEditorRainbow.classList.toggle('is-active', progress.rainbow);
+    elements.galleryEditorRainbow.setAttribute('aria-pressed', String(progress.rainbow));
+    Array.prototype.forEach.call(elements.galleryEditorLlbButtons, function (button) {
+      var active = Number(button.dataset.galleryLlb) === progress.llb;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  function openGalleryEditor(id) {
+    if (state.sharedPreview || !findLegend(id)) return;
+    state.galleryEditId = String(id);
+    updateGalleryEditor();
+    if (!elements.galleryEditorDialog.open) elements.galleryEditorDialog.showModal();
+  }
+
   function onGridClick(event) {
     if (state.sharedPreview) return;
+    var tile = event.target.closest('.gallery-tile');
+    if (tile) {
+      if (tile.dataset.holdOpened === 'true') {
+        delete tile.dataset.holdOpened;
+        return;
+      }
+      toggleLegendOwned(tile.dataset.id);
+      return;
+    }
     var action = event.target.closest('[data-action]');
     if (!action || action.tagName === 'SELECT') return;
     var card = action.closest('.legend-card');
     if (!card) return;
     var id = card.dataset.id;
-    var progress = getProgress(id);
-
     if (action.dataset.action === 'owned') {
-      progress.owned = !progress.owned;
-      if (!progress.owned) {
-        progress.rainbow = false;
-        progress.llb = 0;
-      }
+      toggleLegendOwned(id);
+      return;
     }
 
     if (action.dataset.action === 'rainbow') {
-      progress.rainbow = !progress.rainbow;
-      if (progress.rainbow) progress.owned = true;
+      toggleLegendRainbow(id);
+      return;
     }
-
-    persistAndRender();
   }
 
   function onGridChange(event) {
@@ -432,10 +493,45 @@
     if (!select) return;
     var card = select.closest('.legend-card');
     if (!card) return;
-    var progress = getProgress(card.dataset.id);
-    progress.llb = clampLlb(select.value);
-    if (progress.llb > 0) progress.owned = true;
-    persistAndRender();
+    setLegendLlb(card.dataset.id, select.value);
+  }
+
+  function onGalleryPointerDown(event) {
+    var tile = event.target.closest('.gallery-tile');
+    if (!tile || state.sharedPreview || event.pointerType !== 'touch') return;
+    window.clearTimeout(elements.galleryHoldTimer);
+    elements.galleryHoldTimer = window.setTimeout(function () {
+      elements.galleryHoldTimer = null;
+      tile.dataset.holdOpened = 'true';
+      openGalleryEditor(tile.dataset.id);
+      window.setTimeout(function () { delete tile.dataset.holdOpened; }, 700);
+    }, 480);
+  }
+
+  function clearGalleryHold() {
+    if (!elements.galleryHoldTimer) return;
+    window.clearTimeout(elements.galleryHoldTimer);
+    elements.galleryHoldTimer = null;
+  }
+
+  function onGalleryContextMenu(event) {
+    var tile = event.target.closest('.gallery-tile');
+    if (!tile) return;
+    event.preventDefault();
+    openGalleryEditor(tile.dataset.id);
+  }
+
+  function onGalleryKeydown(event) {
+    if (state.sharedPreview) return;
+    var tile = event.target.closest('.gallery-tile');
+    if (!tile) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleLegendOwned(tile.dataset.id);
+    } else if (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) {
+      event.preventDefault();
+      openGalleryEditor(tile.dataset.id);
+    }
   }
 
   function chooseFilter(event) {
@@ -849,6 +945,13 @@
   function bindEvents() {
     elements.grid.addEventListener('click', onGridClick);
     elements.grid.addEventListener('change', onGridChange);
+    elements.grid.addEventListener('pointerdown', onGalleryPointerDown);
+    elements.grid.addEventListener('pointerup', clearGalleryHold);
+    elements.grid.addEventListener('pointercancel', clearGalleryHold);
+    elements.grid.addEventListener('pointerleave', clearGalleryHold);
+    elements.grid.addEventListener('pointermove', clearGalleryHold);
+    elements.grid.addEventListener('contextmenu', onGalleryContextMenu);
+    elements.grid.addEventListener('keydown', onGalleryKeydown);
     elements.search.addEventListener('input', function (event) {
       state.search = event.target.value;
       renderGrid();
@@ -876,6 +979,23 @@
     elements.downloadImage.addEventListener('click', generateShareImage);
     elements.applyImport.addEventListener('click', importBackup);
     elements.saveSharedCopy.addEventListener('click', saveSharedCopy);
+    elements.galleryEditorDialog.addEventListener('close', function () { state.galleryEditId = null; });
+    elements.galleryEditorOwned.addEventListener('click', function () {
+      if (!state.galleryEditId) return;
+      toggleLegendOwned(state.galleryEditId);
+      updateGalleryEditor();
+    });
+    elements.galleryEditorRainbow.addEventListener('click', function () {
+      if (!state.galleryEditId) return;
+      toggleLegendRainbow(state.galleryEditId);
+      updateGalleryEditor();
+    });
+    elements.galleryEditorLlbOptions.addEventListener('click', function (event) {
+      var button = event.target.closest('[data-gallery-llb]');
+      if (!button || !state.galleryEditId) return;
+      setLegendLlb(state.galleryEditId, button.dataset.galleryLlb);
+      updateGalleryEditor();
+    });
     window.addEventListener('hashchange', syncSharedPreviewFromUrl);
     document.querySelector('.dialog-tabs').addEventListener('click', function (event) {
       var tab = event.target.closest('[data-transfer-view]');
@@ -907,6 +1027,14 @@
     elements.backupButton = byId('backup-button');
     elements.shareButton = byId('share-button');
     elements.backupDialog = byId('backup-dialog');
+    elements.galleryEditorDialog = byId('gallery-editor-dialog');
+    elements.galleryEditorArt = byId('gallery-editor-art');
+    elements.galleryEditorName = byId('gallery-editor-name');
+    elements.galleryEditorId = byId('gallery-editor-id');
+    elements.galleryEditorOwned = byId('gallery-editor-owned');
+    elements.galleryEditorRainbow = byId('gallery-editor-rainbow');
+    elements.galleryEditorLlbOptions = document.querySelector('.gallery-editor-llb-options');
+    elements.galleryEditorLlbButtons = document.querySelectorAll('[data-gallery-llb]');
     elements.exportView = byId('export-view');
     elements.importView = byId('import-view');
     elements.shareView = byId('share-view');
