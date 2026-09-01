@@ -25,7 +25,7 @@ jobs:
 
       - name: Commit changed source data
         run: |
-          if git diff --quiet -- data/official-campaign-feed.json; then
+          if [ -z "$(git status --short -- data/official-campaign-feed.json)" ]; then
             echo "No official campaign changes found."
             exit 0
           fi
