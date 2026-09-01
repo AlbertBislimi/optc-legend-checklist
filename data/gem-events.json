@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "reviewedAt": "2026-09-01T20:07:54Z",
+  "officialFeedUrl": "https://optc-ww.channel.or.jp/wp-json/wp/v2/posts?categories=8&per_page=100",
+  "events": [
+    {
+      "id": "team-letter-web-store-code",
+      "title": "Web Store promo code",
+      "kind": "claim",
+      "gems": 20,
+      "startsAt": "2026-07-10T00:00:00-08:00",
+      "endsAt": "2026-09-09T19:00:00-08:00",
+      "endsLabel": "Sep 9, 7:00 PM PST",
+      "requirements": "Enter QXJZMT in the Web Store. One claim per account; a Bandai Namco ID is required.",
+      "sourceUrl": "https://optc-ww.channel.or.jp/news/2441/",
+      "sourceLabel": "Official OPTC team letter"
+    },
+    {
+      "id": "loki-arrival-social-points",
+      "title": "Loki arrival social campaign",
+      "kind": "earnable",
+      "gems": 15,
+      "startsAt": "2026-08-25T19:00:00-08:00",
+      "endsAt": "2026-09-01T06:59:00-08:00",
+      "endsLabel": "Sep 1, 6:59 AM PST",
+      "requirements": "Earn 400 points through eligible official X activity and game login, then exchange the points.",
+      "sourceUrl": "https://optc-ww.channel.or.jp/news/2667/",
+      "sourceLabel": "Official campaign rules"
+    },
+    {
+      "id": "loki-arrival-video-prize",
+      "title": "Loki video-posting prize",
+      "kind": "chance",
+      "gems": 50,
+      "startsAt": "2026-08-22T19:30:00-08:00",
+      "endsAt": "2026-09-06T06:59:00-08:00",
+      "endsLabel": "Sep 6, 6:59 AM PST",
+      "requirements": "Five winners only. It is shown for awareness but deliberately excluded from projections.",
+      "sourceUrl": "https://optc-ww.channel.or.jp/news/2615/",
+      "sourceLabel": "Official campaign rules"
+    }
+  ]
+}

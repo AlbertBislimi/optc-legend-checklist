@@ -8,6 +8,12 @@
     'new-year': { month: 0, day: 1 },
     anniversary: { month: 4, day: 12 }
   };
+  var GEM_EVENT_TYPES = {
+    guaranteed: { label: 'Guaranteed', countable: true },
+    claim: { label: 'Claim', countable: true },
+    earnable: { label: 'Earn', countable: true },
+    chance: { label: 'Chance', countable: false }
+  };
   var LEGEND_POOLS = {
     'super-sugo': { label: 'Super Sugo', flag: 'superlrr' },
     anniversary: { label: 'Anniversary', flag: 'annilrr' },
@@ -20,6 +26,10 @@
     progress: {},
     sharedPreview: false,
     gemPlan: null,
+    gemEvents: [],
+    gemEventsMeta: null,
+    gemEventsLoading: true,
+    gemEventsError: false,
     drawerOpen: false,
     view: 'gallery',
     galleryEditId: null,
@@ -171,6 +181,27 @@
     return Number.isFinite(number) && number >= 0 ? Math.round(number) : fallback;
   }
 
+  function defaultGemEventState() {
+    return { planned: false, claimed: false };
+  }
+
+  function normaliseGemEventState(entry) {
+    var next = defaultGemEventState();
+    if (!entry || typeof entry !== 'object') return next;
+    next.claimed = Boolean(entry.claimed);
+    next.planned = Boolean(entry.planned) && !next.claimed;
+    return next;
+  }
+
+  function normaliseGemEventStates(entries) {
+    if (!entries || typeof entries !== 'object' || Array.isArray(entries)) return {};
+    return Object.keys(entries).reduce(function (all, id) {
+      if (!/^[a-z0-9_-]+$/i.test(id)) return all;
+      all[id] = normaliseGemEventState(entries[id]);
+      return all;
+    }, {});
+  }
+
   function defaultGemPlan() {
     var today = atLocalMidnight(new Date());
     return {
@@ -178,7 +209,8 @@
       dailyGems: 3,
       startDate: toDateInputValue(today),
       customName: 'Custom banner',
-      customDate: toDateInputValue(addDays(today, 90))
+      customDate: toDateInputValue(addDays(today, 90)),
+      eventStates: {}
     };
   }
 
@@ -190,6 +222,7 @@
     if (parseDateInput(entry.startDate)) plan.startDate = entry.startDate;
     if (parseDateInput(entry.customDate)) plan.customDate = entry.customDate;
     if (typeof entry.customName === 'string' && entry.customName.trim()) plan.customName = entry.customName.trim().slice(0, 40);
+    plan.eventStates = normaliseGemEventStates(entry.eventStates);
     return plan;
   }
 
@@ -235,6 +268,103 @@
     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  function eventTimestamp(value, isEnd) {
+    if (typeof value !== 'string' || !value) return null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      var date = parseDateInput(value);
+      if (!date) return null;
+      return isEnd
+        ? new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime() - 1
+        : date.getTime();
+    }
+    var timestamp = Date.parse(value);
+    return Number.isFinite(timestamp) ? timestamp : null;
+  }
+
+  function safeEventUrl(value) {
+    try {
+      var url = new URL(value, window.location.href);
+      return /^https?:$/.test(url.protocol) ? url.href : '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function normaliseGemEvent(entry) {
+    if (!entry || typeof entry !== 'object') return null;
+    var id = String(entry.id || '').trim().replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+    var title = typeof entry.title === 'string' ? entry.title.trim().slice(0, 110) : '';
+    if (!id || !title) return null;
+    var kind = Object.prototype.hasOwnProperty.call(GEM_EVENT_TYPES, entry.kind) ? entry.kind : 'earnable';
+    var sourceUrl = safeEventUrl(entry.sourceUrl);
+    var startTime = eventTimestamp(entry.startsAt, false);
+    var endTime = eventTimestamp(entry.endsAt, true);
+
+    return {
+      id: id,
+      title: title,
+      kind: kind,
+      gems: gemNumber(entry.gems, 0),
+      startsAt: startTime,
+      endsAt: endTime,
+      startsLabel: typeof entry.startsLabel === 'string' ? entry.startsLabel.trim().slice(0, 50) : '',
+      endsLabel: typeof entry.endsLabel === 'string' ? entry.endsLabel.trim().slice(0, 50) : '',
+      requirements: typeof entry.requirements === 'string' ? entry.requirements.trim().slice(0, 260) : '',
+      sourceUrl: sourceUrl,
+      sourceLabel: typeof entry.sourceLabel === 'string' ? entry.sourceLabel.trim().slice(0, 60) : 'Official source'
+    };
+  }
+
+  function normaliseGemEventsPayload(payload) {
+    var source = payload && typeof payload === 'object' ? payload : {};
+    var seen = {};
+    var events = Array.isArray(source.events) ? source.events.reduce(function (all, entry) {
+      var event = normaliseGemEvent(entry);
+      if (!event || seen[event.id]) return all;
+      seen[event.id] = true;
+      all.push(event);
+      return all;
+    }, []) : [];
+
+    return {
+      events: events,
+      reviewedAt: eventTimestamp(source.reviewedAt, false),
+      officialFeedUrl: safeEventUrl(source.officialFeedUrl)
+    };
+  }
+
+  function getGemEventState(id) {
+    var eventStates = state.gemPlan && state.gemPlan.eventStates ? state.gemPlan.eventStates : {};
+    return normaliseGemEventState(eventStates[id]);
+  }
+
+  function getGemEventType(event) {
+    return GEM_EVENT_TYPES[event.kind] || GEM_EVENT_TYPES.earnable;
+  }
+
+  function isGemEventExpired(event, now) {
+    return Boolean(event.endsAt && event.endsAt < (now || Date.now()));
+  }
+
+  function isGemEventSelectable(event) {
+    return getGemEventType(event).countable && !isGemEventExpired(event);
+  }
+
+  function eventIsAvailableByTarget(event, targetDate) {
+    if (!targetDate || !isGemEventSelectable(event)) return false;
+    var targetEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1).getTime() - 1;
+    return !event.startsAt || event.startsAt <= targetEnd;
+  }
+
+  function selectedGemEventGems(targetDate) {
+    return state.gemEvents.reduce(function (total, event) {
+      var eventState = getGemEventState(event.id);
+      return eventState.planned && !eventState.claimed && eventIsAvailableByTarget(event, targetDate)
+        ? total + event.gems
+        : total;
+    }, 0);
+  }
+
   function updateGemTarget(key, targetDate, startDate) {
     var card = document.querySelector('[data-gem-target="' + key + '"]');
     var total = card.querySelector('[data-gem-target-total]');
@@ -251,11 +381,12 @@
     }
 
     var savingDays = Math.max(0, daysBetween(startDate, targetDate));
-    var projected = plan.currentGems + plan.dailyGems * savingDays;
+    var eventGems = selectedGemEventGems(targetDate);
+    var projected = plan.currentGems + plan.dailyGems * savingDays + eventGems;
     card.classList.remove('is-unavailable');
     total.textContent = projected.toLocaleString();
     if (date) date.textContent = formatGemDate(targetDate);
-    days.textContent = savingDays + (savingDays === 1 ? ' day of saving' : ' days of saving');
+    days.textContent = savingDays + (savingDays === 1 ? ' day of saving' : ' days of saving') + (eventGems ? ' · +' + eventGems + ' event gems' : '');
   }
 
   function updateGemPlan() {
@@ -269,7 +400,9 @@
     updateGemTarget('new-year', nextAnnualTarget(GEM_TARGETS['new-year'].month, GEM_TARGETS['new-year'].day, targetReference), startDate);
     updateGemTarget('anniversary', nextAnnualTarget(GEM_TARGETS.anniversary.month, GEM_TARGETS.anniversary.day, targetReference), startDate);
     updateGemTarget('custom', customTarget, startDate);
-    elements.gemPlanSummary.textContent = 'Starting with ' + plan.currentGems.toLocaleString() + ' gems and saving ' + plan.dailyGems.toLocaleString() + ' per day from ' + formatGemDate(startDate) + '.';
+    var selectedNow = selectedGemEventGems(addDays(today, 3650));
+    var eventText = selectedNow ? ' +' + selectedNow.toLocaleString() + ' selected event gems included.' : ' No event rewards selected.';
+    elements.gemPlanSummary.textContent = 'Starting with ' + plan.currentGems.toLocaleString() + ' gems and saving ' + plan.dailyGems.toLocaleString() + ' per day from ' + formatGemDate(startDate) + '.' + eventText;
   }
 
   function syncGemPlan() {
@@ -280,6 +413,198 @@
     state.gemPlan.customName = elements.gemCustomName.value.trim().slice(0, 40) || 'Custom banner';
     saveGemPlan();
     updateGemPlan();
+  }
+
+  function eventTimingText(event) {
+    var now = Date.now();
+    if (isGemEventExpired(event, now)) return 'Ended ' + (event.endsLabel || formatGemDate(new Date(event.endsAt)));
+    if (event.startsAt && event.startsAt > now) return 'Starts ' + (event.startsLabel || formatGemDate(new Date(event.startsAt)));
+    if (event.endsAt) return (event.kind === 'claim' ? 'Claim by ' : 'Ends ') + (event.endsLabel || formatGemDate(new Date(event.endsAt)));
+    return 'No deadline listed';
+  }
+
+  function renderGemEvent(event) {
+    var eventState = getGemEventState(event.id);
+    var type = getGemEventType(event);
+    var expired = isGemEventExpired(event);
+    var selectable = isGemEventSelectable(event);
+    var article = document.createElement('article');
+    article.className = 'gem-event gem-event-' + event.kind + (expired ? ' is-expired' : '') + (eventState.planned ? ' is-planned' : '') + (eventState.claimed ? ' is-claimed' : '');
+
+    var main = document.createElement('div');
+    main.className = 'gem-event-main';
+    var typeLabel = document.createElement('span');
+    typeLabel.className = 'gem-event-kind';
+    typeLabel.textContent = type.label;
+    var title = document.createElement('h4');
+    title.textContent = event.title;
+    var timing = document.createElement('p');
+    timing.className = 'gem-event-timing';
+    timing.textContent = eventTimingText(event);
+    main.append(typeLabel, title, timing);
+
+    var reward = document.createElement('div');
+    reward.className = 'gem-event-reward';
+    var gems = document.createElement('strong');
+    gems.textContent = '+' + event.gems.toLocaleString();
+    var gemLabel = document.createElement('span');
+    gemLabel.textContent = 'gems';
+    reward.append(gems, gemLabel);
+    if (event.sourceUrl) {
+      var source = document.createElement('a');
+      source.href = event.sourceUrl;
+      source.target = '_blank';
+      source.rel = 'noreferrer';
+      source.title = event.sourceLabel;
+      source.textContent = 'Source ↗';
+      reward.append(source);
+    }
+
+    article.append(main, reward);
+    if (event.requirements) {
+      var requirements = document.createElement('p');
+      requirements.className = 'gem-event-requirements';
+      requirements.textContent = event.requirements;
+      article.append(requirements);
+    }
+
+    if (event.kind === 'chance') {
+      var chanceNote = document.createElement('p');
+      chanceNote.className = 'gem-event-status';
+      chanceNote.textContent = 'Not counted in projections';
+      article.append(chanceNote);
+      return article;
+    }
+
+    var actions = document.createElement('div');
+    actions.className = 'gem-event-actions';
+    if (selectable && !eventState.claimed) {
+      var planLabel = document.createElement('label');
+      planLabel.className = 'gem-event-plan-toggle';
+      var planInput = document.createElement('input');
+      planInput.type = 'checkbox';
+      planInput.checked = eventState.planned;
+      planInput.dataset.gemEventPlan = event.id;
+      var planText = document.createElement('span');
+      planText.textContent = 'Add to plan';
+      planLabel.append(planInput, planText);
+      actions.append(planLabel);
+    }
+
+    var claimButton = document.createElement('button');
+    claimButton.type = 'button';
+    claimButton.className = 'gem-event-claim-button';
+    claimButton.dataset.gemEventClaim = event.id;
+    claimButton.disabled = !selectable && !eventState.claimed;
+    claimButton.textContent = eventState.claimed ? 'Undo claimed' : (expired ? 'Expired' : 'Mark claimed');
+    actions.append(claimButton);
+    article.append(actions);
+
+    if (eventState.claimed) {
+      var claimedNote = document.createElement('p');
+      claimedNote.className = 'gem-event-status';
+      claimedNote.textContent = 'Claimed — add it to Gems now when you are ready.';
+      article.append(claimedNote);
+    }
+    return article;
+  }
+
+  function renderGemEvents() {
+    if (!elements.gemEventList) return;
+    elements.gemEventList.replaceChildren();
+
+    if (state.gemEventsLoading) {
+      elements.gemEventsSummary.textContent = 'Loading reviewed rewards…';
+      return;
+    }
+    if (state.gemEventsError) {
+      elements.gemEventsSummary.textContent = 'Official rewards could not load. Your savings projection still works.';
+      return;
+    }
+    if (!state.gemEvents.length) {
+      elements.gemEventsSummary.textContent = 'No reviewed event rewards are listed right now.';
+      return;
+    }
+
+    var visibleEvents = state.gemEvents.filter(function (event) {
+      return !isGemEventExpired(event) || getGemEventState(event.id).claimed;
+    });
+    var selectable = visibleEvents.filter(function (event) {
+      return isGemEventSelectable(event) && !getGemEventState(event.id).claimed;
+    });
+    var chanceCount = visibleEvents.filter(function (event) { return event.kind === 'chance'; }).length;
+    var potential = selectable.reduce(function (total, event) { return total + event.gems; }, 0);
+    var planned = selectable.reduce(function (total, event) {
+      return getGemEventState(event.id).planned ? total + event.gems : total;
+    }, 0);
+    elements.gemEventsSummary.textContent = selectable.length
+      ? selectable.length + ' reward' + (selectable.length === 1 ? '' : 's') + ' available · +' + potential.toLocaleString() + ' gems possible · +' + planned.toLocaleString() + ' in your plan' + (chanceCount ? ' · ' + chanceCount + ' chance prize excluded' : '')
+      : (chanceCount ? chanceCount + ' chance prize' + (chanceCount === 1 ? '' : 's') + ' listed · never counted' : 'No claimable or earnable rewards are active right now.');
+    if (state.gemEventsMeta && state.gemEventsMeta.officialFeedUrl) elements.gemEventsFeedLink.href = state.gemEventsMeta.officialFeedUrl;
+
+    var fragment = document.createDocumentFragment();
+    visibleEvents.forEach(function (event) { fragment.append(renderGemEvent(event)); });
+    elements.gemEventList.append(fragment);
+  }
+
+  function setGemEventPlan(id, planned) {
+    if (!state.gemPlan.eventStates) state.gemPlan.eventStates = {};
+    var next = getGemEventState(id);
+    next.planned = Boolean(planned) && !next.claimed;
+    state.gemPlan.eventStates[id] = next;
+    saveGemPlan();
+    renderGemEvents();
+    updateGemPlan();
+  }
+
+  function toggleGemEventClaimed(id) {
+    if (!state.gemPlan.eventStates) state.gemPlan.eventStates = {};
+    var next = getGemEventState(id);
+    next.claimed = !next.claimed;
+    if (next.claimed) next.planned = false;
+    state.gemPlan.eventStates[id] = next;
+    saveGemPlan();
+    renderGemEvents();
+    updateGemPlan();
+  }
+
+  function onGemEventChange(event) {
+    var input = event.target.closest('[data-gem-event-plan]');
+    if (!input) return;
+    setGemEventPlan(input.dataset.gemEventPlan, input.checked);
+  }
+
+  function onGemEventClick(event) {
+    var button = event.target.closest('[data-gem-event-claim]');
+    if (!button || button.disabled) return;
+    toggleGemEventClaimed(button.dataset.gemEventClaim);
+  }
+
+  function loadGemEvents() {
+    state.gemEventsLoading = true;
+    state.gemEventsError = false;
+    renderGemEvents();
+
+    return fetch('data/gem-events.json', { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load event rewards.');
+        return response.json();
+      })
+      .then(function (payload) {
+        var data = normaliseGemEventsPayload(payload);
+        state.gemEvents = data.events;
+        state.gemEventsMeta = data;
+      })
+      .catch(function () {
+        state.gemEvents = [];
+        state.gemEventsMeta = null;
+        state.gemEventsError = true;
+      })
+      .then(function () {
+        state.gemEventsLoading = false;
+        renderGemEvents();
+        updateGemPlan();
+      });
   }
 
   function getProgress(id) {
@@ -1121,6 +1446,8 @@
     elements.gemPlannerControls.addEventListener('change', syncGemPlan);
     elements.gemCustomName.addEventListener('input', syncGemPlan);
     elements.gemCustomDate.addEventListener('change', syncGemPlan);
+    elements.gemEventList.addEventListener('change', onGemEventChange);
+    elements.gemEventList.addEventListener('click', onGemEventClick);
     elements.search.addEventListener('input', function (event) {
       state.search = event.target.value;
       renderGrid();
@@ -1190,6 +1517,9 @@
     elements.gemCustomName = byId('gem-custom-name');
     elements.gemCustomDate = byId('gem-custom-date');
     elements.gemPlanSummary = byId('gem-plan-summary');
+    elements.gemEventList = byId('gem-event-list');
+    elements.gemEventsSummary = byId('gem-events-summary');
+    elements.gemEventsFeedLink = byId('gem-events-feed-link');
     elements.grid = byId('legend-grid');
     elements.template = byId('legend-card-template');
     elements.galleryTemplate = byId('gallery-tile-template');
@@ -1244,6 +1574,7 @@
     updateLegendPoolOptions();
     bindEvents();
     renderGrid();
+    loadGemEvents();
   }
 
   document.addEventListener('DOMContentLoaded', start);

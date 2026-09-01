@@ -8,14 +8,14 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-drawer">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-event-rewards-v3">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker-full-art"></script>
-  <script defer src="js/scripts.js?v=legend-locker-drawer"></script>
+  <script defer src="js/scripts.js?v=legend-locker-event-rewards-v3"></script>
 </head>
 
 <body>
@@ -165,6 +165,19 @@
               <input id="gem-start-date" type="date">
             </label>
           </div>
+
+          <section class="gem-events" aria-labelledby="gem-events-title">
+            <div class="gem-events-heading">
+              <div>
+                <p class="eyebrow">Official rewards</p>
+                <h3 id="gem-events-title">Event gems</h3>
+              </div>
+              <a id="gem-events-feed-link" class="gem-events-feed-link" href="https://optc-ww.channel.or.jp/news/" target="_blank" rel="noreferrer">Official news ↗</a>
+            </div>
+            <p id="gem-events-summary" class="gem-events-summary" aria-live="polite">Loading reviewed rewards…</p>
+            <div id="gem-event-list" class="gem-event-list" aria-live="polite"></div>
+            <p class="gem-events-footnote">Only rewards you add to your plan are included below. Chance prizes are never counted.</p>
+          </section>
 
           <div class="gem-target-grid" aria-live="polite">
             <article class="gem-target-card" data-gem-target="new-year">

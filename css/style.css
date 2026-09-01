@@ -237,6 +237,38 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
 .utility-drawer .gem-plan-field:last-child { grid-column: 1 / -1; }
 .utility-drawer .gem-plan-field input { min-height: 24px; font-size: 14px; }
 .utility-drawer .gem-plan-field input[type="date"] { font-size: 12px; }
+.utility-drawer .gem-events { margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--line); }
+.gem-events-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.gem-events-heading .eyebrow { margin-bottom: 3px; color: #d3c1ff; font-size: 8px; }
+.gem-events-heading h3 { margin: 0; color: var(--ink); font-size: 14px; letter-spacing: -0.025em; }
+.gem-events-feed-link { flex: 0 0 auto; color: #cdbbff; font-size: 10px; font-weight: 800; text-decoration: none; }
+.gem-events-feed-link:hover { color: #eee8ff; text-decoration: underline; }
+.gem-events-summary { margin: 7px 0 0; color: var(--muted-strong); font-size: 10px; line-height: 1.45; }
+.gem-event-list { margin-top: 8px; border-top: 1px solid var(--line); }
+.gem-event { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main reward" "requirements requirements" "actions actions" "status status"; column-gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.gem-event-main { grid-area: main; min-width: 0; }
+.gem-event-kind { display: inline-flex; align-items: center; min-height: 16px; margin-bottom: 3px; padding: 1px 5px; color: #d8f8e8; font-size: 8px; font-weight: 850; letter-spacing: 0.07em; text-transform: uppercase; border: 1px solid rgba(94, 211, 160, 0.25); border-radius: 99px; background: rgba(58, 180, 125, 0.12); }
+.gem-event-claim .gem-event-kind { color: #ffe5a5; border-color: rgba(247, 202, 111, 0.26); background: rgba(247, 202, 111, 0.11); }
+.gem-event-chance .gem-event-kind { color: #d4c9ed; border-color: rgba(193, 177, 255, 0.2); background: rgba(165, 135, 235, 0.1); }
+.gem-event h4 { margin: 0; color: var(--ink); font-size: 12px; line-height: 1.25; letter-spacing: -0.018em; }
+.gem-event-timing { margin: 3px 0 0; color: var(--muted); font-size: 9px; font-weight: 700; }
+.gem-event-reward { grid-area: reward; display: grid; align-content: start; justify-items: end; min-width: 48px; }
+.gem-event-reward strong { color: #fff; font-size: 17px; line-height: 1; letter-spacing: -0.045em; }
+.gem-event-reward span { margin-top: 1px; color: var(--muted); font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.gem-event-reward a { margin-top: 5px; color: #c9b6ff; font-size: 9px; font-weight: 800; text-decoration: none; }
+.gem-event-reward a:hover { color: #eee8ff; text-decoration: underline; }
+.gem-event-requirements { grid-area: requirements; margin: 7px 0 0; color: var(--muted-strong); font-size: 10px; line-height: 1.4; }
+.gem-event-actions { grid-area: actions; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.gem-event-plan-toggle { display: inline-flex; align-items: center; gap: 5px; color: #dce5ff; font-size: 10px; font-weight: 800; cursor: pointer; }
+.gem-event-plan-toggle input { width: 14px; height: 14px; margin: 0; accent-color: #68dca4; }
+.gem-event-claim-button { min-height: 24px; padding: 4px 7px; color: #cfc5eb; font-size: 9px; font-weight: 800; border: 1px solid rgba(193, 177, 255, 0.24); border-radius: 6px; background: rgba(73, 53, 128, 0.24); }
+.gem-event-claim-button:hover:not(:disabled) { color: #fff; border-color: rgba(204, 185, 255, 0.55); background: rgba(103, 75, 178, 0.4); }
+.gem-event-claim-button:disabled { cursor: not-allowed; opacity: 0.52; }
+.gem-event-status { grid-area: status; margin: 7px 0 0; color: #bdaee0; font-size: 9px; font-weight: 750; }
+.gem-event.is-planned { background: linear-gradient(90deg, rgba(61, 154, 113, 0.11), transparent 72%); }
+.gem-event.is-claimed { background: linear-gradient(90deg, rgba(89, 69, 143, 0.15), transparent 72%); }
+.gem-event.is-expired { opacity: 0.56; }
+.gem-events-footnote { margin: 9px 0 0; color: var(--muted); font-size: 9px; line-height: 1.42; }
 .utility-drawer .gem-target-grid { display: block; margin-top: 12px; border-top: 1px solid var(--line); }
 .utility-drawer .gem-target-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "heading total" "date days"; column-gap: 11px; align-items: center; padding: 10px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
 .utility-drawer .gem-target-heading { grid-area: heading; }
