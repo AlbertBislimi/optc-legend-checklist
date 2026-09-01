@@ -162,6 +162,41 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
 .rainbow-meter span { background: var(--rainbow); }
 .llb-meter span { background: linear-gradient(90deg, #8f66f4, #d1bcff); }
 
+.gem-planner { position: relative; overflow: hidden; margin-bottom: 16px; padding: clamp(17px, 2.2vw, 25px); border: 1px solid rgba(193, 177, 255, 0.24); border-radius: 14px; background: linear-gradient(135deg, rgba(38, 29, 86, 0.72), rgba(10, 21, 49, 0.9)); box-shadow: 0 14px 38px rgba(4, 3, 20, 0.2); }
+.gem-planner::after { position: absolute; top: -115px; right: -80px; width: 270px; height: 270px; content: ""; pointer-events: none; border-radius: 50%; background: radial-gradient(circle, rgba(247, 202, 111, 0.16), transparent 67%); }
+.gem-planner-heading { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin-bottom: 17px; }
+.gem-planner-heading .eyebrow { margin-bottom: 6px; color: #d3c1ff; }
+.gem-planner-heading h2 { margin: 0; font-size: clamp(20px, 2.2vw, 27px); letter-spacing: -0.045em; }
+.gem-planner-heading > div > p:last-child { max-width: 635px; margin: 7px 0 0; color: var(--muted-strong); font-size: 12px; line-height: 1.5; }
+.gem-planner-note { max-width: 235px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; text-align: right; }
+.gem-planner-controls { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.gem-plan-field { display: grid; gap: 6px; min-width: 0; padding: 9px 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid rgba(182, 172, 241, 0.18); border-radius: 9px; background: rgba(4, 8, 27, 0.36); }
+.gem-plan-field input { width: 100%; min-height: 27px; padding: 0; color: var(--ink); font-size: 16px; font-weight: 800; letter-spacing: -0.03em; text-transform: none; border: 0; outline: 0; background: transparent; }
+.gem-plan-field input::-webkit-inner-spin-button { opacity: 0.6; }
+.gem-plan-field input[type="date"] { font-size: 13px; letter-spacing: 0; color-scheme: dark; }
+.gem-target-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 11px; }
+.gem-target-card { min-width: 0; padding: 13px; border: 1px solid rgba(182, 172, 241, 0.19); border-radius: 10px; background: rgba(5, 10, 30, 0.48); }
+.gem-target-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.gem-target-heading > div { min-width: 0; flex: 1; }
+.gem-target-kicker { margin: 0 0 3px; color: #ac9bd8; font-size: 9px; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+.gem-target-card h3 { margin: 0; color: #e9e4ff; font-size: 14px; letter-spacing: -0.02em; }
+.gem-target-symbol { display: grid; place-items: center; width: 26px; height: 26px; flex: 0 0 auto; color: #ffe6a2; font-size: 15px; border-radius: 8px; background: rgba(242, 190, 86, 0.13); }
+.anniversary-symbol { color: #dabfff; background: rgba(176, 127, 255, 0.15); }
+.custom-symbol { color: #9cefd0; background: rgba(85, 207, 164, 0.13); }
+.gem-target-date,
+.gem-custom-date { display: block; min-height: 18px; margin: 8px 0 12px; color: var(--muted); font-size: 11px; font-weight: 700; }
+.gem-custom-date { width: 100%; padding: 0; color-scheme: dark; border: 0; outline: 0; background: transparent; }
+.gem-target-card strong { display: block; color: #fff; font-size: clamp(23px, 2.2vw, 30px); letter-spacing: -0.055em; }
+.gem-target-card strong small { color: #c4bbdf; font-size: 11px; font-weight: 750; letter-spacing: 0; }
+.gem-target-saving { margin: 5px 0 0; color: var(--muted-strong); font-size: 11px; }
+.gem-target-card.is-unavailable { opacity: 0.62; }
+.gem-custom-name { width: 100%; padding: 0; color: #e9e4ff; font-size: 14px; font-weight: 800; letter-spacing: -0.02em; border: 0; outline: 0; background: transparent; }
+.gem-custom-name::placeholder { color: var(--muted); }
+.gem-custom-name:focus,
+.gem-custom-date:focus { color: #fff; }
+.gem-plan-summary { position: relative; z-index: 1; margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; white-space: nowrap; clip: rect(0, 0, 0, 0); border: 0; }
+
 .collection-panel { padding: clamp(17px, 2.2vw, 28px); border: 1px solid var(--line); border-radius: 14px; background: rgba(8, 14, 34, 0.74); backdrop-filter: blur(16px); }
 .collection-heading { align-items: flex-end; margin-bottom: 21px; }
 .collection-heading h2 { font-size: clamp(21px, 2.4vw, 29px); }
@@ -328,6 +363,10 @@ textarea:focus-visible { outline: 2px solid var(--accent-bright); outline-offset
   .progress-icon { width: 20px; height: 20px; font-size: 11px; }
   .progress-card strong { margin: 6px 0 7px; font-size: 20px; }
   .progress-card small { display: block; margin-top: -1px; font-size: 10px; }
+  .gem-planner-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .gem-planner-note { max-width: none; text-align: left; }
+  .gem-planner-controls { grid-template-columns: 1fr; }
+  .gem-target-grid { grid-template-columns: 1fr; }
   .collection-panel { padding: 15px 11px; }
   .collection-heading { align-items: flex-start; flex-direction: column; }
   .instruction { max-width: none; text-align: left; }

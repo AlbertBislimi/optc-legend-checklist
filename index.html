@@ -8,14 +8,14 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-gallery-edit">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-gem-planner">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker-full-art"></script>
-  <script defer src="js/scripts.js?v=legend-locker-gallery-edit"></script>
+  <script defer src="js/scripts.js?v=legend-locker-gem-planner"></script>
 </head>
 
 <body>
@@ -73,6 +73,77 @@
           <strong id="llb-count">0 <small>/ 0</small></strong>
           <div class="meter llb-meter"><span id="llb-meter"></span></div>
         </article>
+      </section>
+
+      <section class="gem-planner" aria-labelledby="gem-planner-title">
+        <div class="gem-planner-heading">
+          <div>
+            <p class="eyebrow">Banner planner</p>
+            <h2 id="gem-planner-title">How many gems could you save?</h2>
+            <p>Set a personal daily saving goal and see your projected total at the next big banner.</p>
+          </div>
+          <p class="gem-planner-note">Planning estimates only—banner dates and rewards can move.</p>
+        </div>
+
+        <div id="gem-planner-controls" class="gem-planner-controls">
+          <label class="gem-plan-field" for="gem-current">
+            <span>Gems you have now</span>
+            <input id="gem-current" type="number" min="0" step="1" inputmode="numeric" value="0">
+          </label>
+          <label class="gem-plan-field" for="gem-daily">
+            <span>Gems you plan to save each day</span>
+            <input id="gem-daily" type="number" min="0" step="1" inputmode="numeric" value="3">
+          </label>
+          <label class="gem-plan-field" for="gem-start-date">
+            <span>Saving since</span>
+            <input id="gem-start-date" type="date">
+          </label>
+        </div>
+
+        <div class="gem-target-grid" aria-live="polite">
+          <article class="gem-target-card" data-gem-target="new-year">
+            <div class="gem-target-heading">
+              <div>
+                <p class="gem-target-kicker">Seasonal banner</p>
+                <h3>New Year</h3>
+              </div>
+              <span class="gem-target-symbol" aria-hidden="true">✦</span>
+            </div>
+            <p class="gem-target-date" data-gem-target-date>—</p>
+            <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
+            <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
+          </article>
+
+          <article class="gem-target-card" data-gem-target="anniversary">
+            <div class="gem-target-heading">
+              <div>
+                <p class="gem-target-kicker">Major celebration</p>
+                <h3>Anniversary</h3>
+              </div>
+              <span class="gem-target-symbol anniversary-symbol" aria-hidden="true">◈</span>
+            </div>
+            <p class="gem-target-date" data-gem-target-date>—</p>
+            <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
+            <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
+          </article>
+
+          <article class="gem-target-card gem-target-custom" data-gem-target="custom">
+            <div class="gem-target-heading">
+              <div>
+                <p class="gem-target-kicker">Your target</p>
+                <label class="sr-only" for="gem-custom-name">Custom banner name</label>
+                <input id="gem-custom-name" class="gem-custom-name" type="text" value="Custom banner" maxlength="40" placeholder="Custom banner" autocomplete="off">
+              </div>
+              <span class="gem-target-symbol custom-symbol" aria-hidden="true">⌁</span>
+            </div>
+            <label class="sr-only" for="gem-custom-date">Custom banner date</label>
+            <input id="gem-custom-date" class="gem-custom-date" type="date">
+            <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
+            <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
+          </article>
+        </div>
+
+        <p id="gem-plan-summary" class="gem-plan-summary"></p>
       </section>
 
       <section class="collection-panel" aria-labelledby="collection-title">

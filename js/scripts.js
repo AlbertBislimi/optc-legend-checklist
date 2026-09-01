@@ -2,7 +2,12 @@
   'use strict';
 
   var STORAGE_KEY = 'optc-legend-progress-v2';
+  var GEM_PLAN_STORAGE_KEY = 'optc-gem-savings-plan-v1';
   var LEGACY_STORAGE_KEYS = ['evohidden'];
+  var GEM_TARGETS = {
+    'new-year': { month: 0, day: 1 },
+    anniversary: { month: 4, day: 12 }
+  };
   var LEGEND_POOLS = {
     'super-sugo': { label: 'Super Sugo', flag: 'superlrr' },
     anniversary: { label: 'Anniversary', flag: 'annilrr' },
@@ -14,6 +19,7 @@
     legends: [],
     progress: {},
     sharedPreview: false,
+    gemPlan: null,
     view: 'gallery',
     galleryEditId: null,
     filter: 'all',
@@ -136,6 +142,143 @@
     } catch (error) {
       setFeedback('Your browser could not save this change.');
     }
+  }
+
+  function toDateInputValue(date) {
+    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+  }
+
+  function atLocalMidnight(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function parseDateInput(value) {
+    var parts = String(value || '').split('-').map(Number);
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return null;
+    var date = new Date(parts[0], parts[1] - 1, parts[2]);
+    return date.getFullYear() === parts[0] && date.getMonth() === parts[1] - 1 && date.getDate() === parts[2] ? date : null;
+  }
+
+  function addDays(date, amount) {
+    var copy = atLocalMidnight(date);
+    copy.setDate(copy.getDate() + amount);
+    return copy;
+  }
+
+  function gemNumber(value, fallback) {
+    var number = Number(value);
+    return Number.isFinite(number) && number >= 0 ? Math.round(number) : fallback;
+  }
+
+  function defaultGemPlan() {
+    var today = atLocalMidnight(new Date());
+    return {
+      currentGems: 0,
+      dailyGems: 3,
+      startDate: toDateInputValue(today),
+      customName: 'Custom banner',
+      customDate: toDateInputValue(addDays(today, 90))
+    };
+  }
+
+  function normaliseGemPlan(entry) {
+    var plan = defaultGemPlan();
+    if (!entry || typeof entry !== 'object') return plan;
+    plan.currentGems = gemNumber(entry.currentGems, plan.currentGems);
+    plan.dailyGems = gemNumber(entry.dailyGems, plan.dailyGems);
+    if (parseDateInput(entry.startDate)) plan.startDate = entry.startDate;
+    if (parseDateInput(entry.customDate)) plan.customDate = entry.customDate;
+    if (typeof entry.customName === 'string' && entry.customName.trim()) plan.customName = entry.customName.trim().slice(0, 40);
+    return plan;
+  }
+
+  function readGemPlan() {
+    try {
+      var raw = localStorage.getItem(GEM_PLAN_STORAGE_KEY);
+      return raw ? normaliseGemPlan(JSON.parse(raw)) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveGemPlan() {
+    try {
+      localStorage.setItem(GEM_PLAN_STORAGE_KEY, JSON.stringify(state.gemPlan));
+    } catch (error) {
+    }
+  }
+
+  function loadGemPlan() {
+    state.gemPlan = readGemPlan() || defaultGemPlan();
+    elements.gemCurrent.value = String(state.gemPlan.currentGems);
+    elements.gemDaily.value = String(state.gemPlan.dailyGems);
+    elements.gemStartDate.value = state.gemPlan.startDate;
+    elements.gemCustomName.value = state.gemPlan.customName;
+    elements.gemCustomDate.value = state.gemPlan.customDate;
+    updateGemPlan();
+  }
+
+  function daysBetween(start, end) {
+    var startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+    var endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+    return Math.round((endUtc - startUtc) / 86400000);
+  }
+
+  function nextAnnualTarget(month, day, referenceDate) {
+    var target = new Date(referenceDate.getFullYear(), month, day);
+    if (target.getTime() < referenceDate.getTime()) target = new Date(referenceDate.getFullYear() + 1, month, day);
+    return target;
+  }
+
+  function formatGemDate(date) {
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function updateGemTarget(key, targetDate, startDate) {
+    var card = document.querySelector('[data-gem-target="' + key + '"]');
+    var total = card.querySelector('[data-gem-target-total]');
+    var date = card.querySelector('[data-gem-target-date]');
+    var days = card.querySelector('[data-gem-target-days]');
+    var plan = state.gemPlan;
+
+    if (!targetDate) {
+      card.classList.add('is-unavailable');
+      total.textContent = '—';
+      if (date) date.textContent = 'Choose an upcoming date';
+      days.textContent = 'No projection yet';
+      return;
+    }
+
+    var savingDays = Math.max(0, daysBetween(startDate, targetDate));
+    var projected = plan.currentGems + plan.dailyGems * savingDays;
+    card.classList.remove('is-unavailable');
+    total.textContent = projected.toLocaleString();
+    if (date) date.textContent = formatGemDate(targetDate);
+    days.textContent = savingDays + (savingDays === 1 ? ' day of saving' : ' days of saving');
+  }
+
+  function updateGemPlan() {
+    var plan = state.gemPlan;
+    var startDate = parseDateInput(plan.startDate) || atLocalMidnight(new Date());
+    var today = atLocalMidnight(new Date());
+    var targetReference = startDate.getTime() > today.getTime() ? startDate : today;
+    var customDate = parseDateInput(plan.customDate);
+    var customTarget = customDate && customDate.getTime() >= targetReference.getTime() ? customDate : null;
+
+    updateGemTarget('new-year', nextAnnualTarget(GEM_TARGETS['new-year'].month, GEM_TARGETS['new-year'].day, targetReference), startDate);
+    updateGemTarget('anniversary', nextAnnualTarget(GEM_TARGETS.anniversary.month, GEM_TARGETS.anniversary.day, targetReference), startDate);
+    updateGemTarget('custom', customTarget, startDate);
+    elements.gemPlanSummary.textContent = 'Starting with ' + plan.currentGems.toLocaleString() + ' gems and saving ' + plan.dailyGems.toLocaleString() + ' per day from ' + formatGemDate(startDate) + '.';
+  }
+
+  function syncGemPlan() {
+    state.gemPlan.currentGems = gemNumber(elements.gemCurrent.value, 0);
+    state.gemPlan.dailyGems = gemNumber(elements.gemDaily.value, 0);
+    if (parseDateInput(elements.gemStartDate.value)) state.gemPlan.startDate = elements.gemStartDate.value;
+    if (parseDateInput(elements.gemCustomDate.value)) state.gemPlan.customDate = elements.gemCustomDate.value;
+    state.gemPlan.customName = elements.gemCustomName.value.trim().slice(0, 40) || 'Custom banner';
+    saveGemPlan();
+    updateGemPlan();
   }
 
   function getProgress(id) {
@@ -952,6 +1095,10 @@
     elements.grid.addEventListener('pointermove', clearGalleryHold);
     elements.grid.addEventListener('contextmenu', onGalleryContextMenu);
     elements.grid.addEventListener('keydown', onGalleryKeydown);
+    elements.gemPlannerControls.addEventListener('input', syncGemPlan);
+    elements.gemPlannerControls.addEventListener('change', syncGemPlan);
+    elements.gemCustomName.addEventListener('input', syncGemPlan);
+    elements.gemCustomDate.addEventListener('change', syncGemPlan);
     elements.search.addEventListener('input', function (event) {
       state.search = event.target.value;
       renderGrid();
@@ -1004,6 +1151,13 @@
   }
 
   function cacheElements() {
+    elements.gemPlannerControls = byId('gem-planner-controls');
+    elements.gemCurrent = byId('gem-current');
+    elements.gemDaily = byId('gem-daily');
+    elements.gemStartDate = byId('gem-start-date');
+    elements.gemCustomName = byId('gem-custom-name');
+    elements.gemCustomDate = byId('gem-custom-date');
+    elements.gemPlanSummary = byId('gem-plan-summary');
     elements.grid = byId('legend-grid');
     elements.template = byId('legend-card-template');
     elements.galleryTemplate = byId('gallery-tile-template');
@@ -1052,6 +1206,7 @@
   function start() {
     cacheElements();
     loadProgress();
+    loadGemPlan();
     loadLegends();
     updateLegendPoolOptions();
     bindEvents();
