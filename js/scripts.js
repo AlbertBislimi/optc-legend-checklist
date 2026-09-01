@@ -20,6 +20,7 @@
     progress: {},
     sharedPreview: false,
     gemPlan: null,
+    drawerOpen: false,
     view: 'gallery',
     galleryEditId: null,
     filter: 'all',
@@ -694,12 +695,32 @@
     renderGrid();
   }
 
+  function setDrawerOpen(open) {
+    var shouldOpen = Boolean(open);
+    var wasOpen = state.drawerOpen;
+    state.drawerOpen = shouldOpen;
+    elements.utilityDrawer.classList.toggle('is-open', shouldOpen);
+    elements.drawerScrim.classList.toggle('is-visible', shouldOpen);
+    elements.utilityDrawer.setAttribute('aria-hidden', String(!shouldOpen));
+    elements.drawerToggle.setAttribute('aria-expanded', String(shouldOpen));
+    document.body.classList.toggle('has-open-drawer', shouldOpen);
+
+    if (shouldOpen) {
+      elements.utilityDrawer.removeAttribute('inert');
+      window.setTimeout(function () { elements.drawerClose.focus(); }, 0);
+    } else {
+      elements.utilityDrawer.setAttribute('inert', '');
+      if (wasOpen) elements.drawerToggle.focus();
+    }
+  }
+
   function resetProgress() {
     if (state.sharedPreview) return;
     if (!window.confirm('Reset all ownership, Rainbow, and LLB progress saved in this browser?')) return;
     state.progress = {};
     saveProgress();
     renderGrid();
+    setDrawerOpen(false);
   }
 
   function serialiseProgress() {
@@ -712,6 +733,7 @@
   }
 
   function openBackup() {
+    setDrawerOpen(false);
     openDialog('export');
   }
 
@@ -1117,6 +1139,9 @@
     });
     document.querySelector('.filter-group').addEventListener('click', chooseFilter);
     document.querySelector('.view-switch').addEventListener('click', chooseView);
+    elements.drawerToggle.addEventListener('click', function () { setDrawerOpen(!state.drawerOpen); });
+    elements.drawerClose.addEventListener('click', function () { setDrawerOpen(false); });
+    elements.drawerScrim.addEventListener('click', function () { setDrawerOpen(false); });
     elements.resetButton.addEventListener('click', resetProgress);
     elements.backupButton.addEventListener('click', openBackup);
     elements.shareButton.addEventListener('click', openShare);
@@ -1144,6 +1169,9 @@
       updateGalleryEditor();
     });
     window.addEventListener('hashchange', syncSharedPreviewFromUrl);
+    window.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && state.drawerOpen) setDrawerOpen(false);
+    });
     document.querySelector('.dialog-tabs').addEventListener('click', function (event) {
       var tab = event.target.closest('[data-transfer-view]');
       if (tab) setTransferView(tab.dataset.transferView);
@@ -1151,6 +1179,10 @@
   }
 
   function cacheElements() {
+    elements.utilityDrawer = byId('utility-drawer');
+    elements.drawerToggle = byId('drawer-toggle');
+    elements.drawerClose = byId('drawer-close');
+    elements.drawerScrim = byId('drawer-scrim');
     elements.gemPlannerControls = byId('gem-planner-controls');
     elements.gemCurrent = byId('gem-current');
     elements.gemDaily = byId('gem-daily');
@@ -1205,6 +1237,7 @@
 
   function start() {
     cacheElements();
+    setDrawerOpen(false);
     loadProgress();
     loadGemPlan();
     loadLegends();

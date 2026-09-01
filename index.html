@@ -8,14 +8,14 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-gem-planner">
+  <link rel="stylesheet" href="css/style.css?v=legend-locker-drawer">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker-full-art"></script>
-  <script defer src="js/scripts.js?v=legend-locker-gem-planner"></script>
+  <script defer src="js/scripts.js?v=legend-locker-drawer"></script>
 </head>
 
 <body>
@@ -34,116 +34,31 @@
         </div>
         <div class="topbar-actions">
           <span id="save-note" class="save-note"><span class="save-dot" aria-hidden="true"></span><span id="save-note-text">Saved automatically</span></span>
+          <div id="shared-collection-notice" class="shared-collection-notice" role="status" hidden>
+            <span>Shared preview</span>
+            <button id="save-shared-copy" type="button">Save copy</button>
+          </div>
+          <button id="drawer-toggle" class="button button-secondary" type="button" aria-controls="utility-drawer" aria-expanded="false">Planner &amp; tools</button>
           <button class="button button-primary" id="share-button" type="button">Share collection</button>
-          <button class="button button-secondary" id="backup-button" type="button">Backup</button>
-          <button class="button button-danger" id="reset-button" type="button">Reset progress</button>
         </div>
       </header>
 
-      <section id="shared-collection-notice" class="shared-collection-notice" role="status" hidden>
-        <div>
-          <p class="eyebrow">Shared collection preview</p>
-          <p>You’re viewing someone else’s collection. Your saved progress has not been changed.</p>
-        </div>
-        <button id="save-shared-copy" class="button button-primary" type="button">Save a copy to edit</button>
-      </section>
-
-      <section class="progress-grid" aria-label="Collection totals">
-        <article class="progress-card">
-          <div class="progress-card-heading">
-            <span>Owned</span>
-            <span class="progress-icon owned-icon">✓</span>
-          </div>
+      <section class="collection-overview" aria-label="Collection totals">
+        <article class="overview-stat">
+          <span>Owned</span>
           <strong id="owned-count">0 <small>/ 0</small></strong>
-          <div class="meter"><span id="owned-meter"></span></div>
+          <div class="overview-meter"><span id="owned-meter"></span></div>
         </article>
-        <article class="progress-card">
-          <div class="progress-card-heading">
-            <span>Rainbow</span>
-            <span class="progress-icon rainbow-icon">◈</span>
-          </div>
+        <article class="overview-stat">
+          <span>Rainbow</span>
           <strong id="rainbow-count">0 <small>/ 0</small></strong>
-          <div class="meter rainbow-meter"><span id="rainbow-meter"></span></div>
+          <div class="overview-meter rainbow-meter"><span id="rainbow-meter"></span></div>
         </article>
-        <article class="progress-card">
-          <div class="progress-card-heading">
-            <span>LLB 5</span>
-            <span class="progress-icon llb-icon">5</span>
-          </div>
+        <article class="overview-stat">
+          <span>LLB 5</span>
           <strong id="llb-count">0 <small>/ 0</small></strong>
-          <div class="meter llb-meter"><span id="llb-meter"></span></div>
+          <div class="overview-meter llb-meter"><span id="llb-meter"></span></div>
         </article>
-      </section>
-
-      <section class="gem-planner" aria-labelledby="gem-planner-title">
-        <div class="gem-planner-heading">
-          <div>
-            <p class="eyebrow">Banner planner</p>
-            <h2 id="gem-planner-title">How many gems could you save?</h2>
-            <p>Set a personal daily saving goal and see your projected total at the next big banner.</p>
-          </div>
-          <p class="gem-planner-note">Planning estimates only—banner dates and rewards can move.</p>
-        </div>
-
-        <div id="gem-planner-controls" class="gem-planner-controls">
-          <label class="gem-plan-field" for="gem-current">
-            <span>Gems you have now</span>
-            <input id="gem-current" type="number" min="0" step="1" inputmode="numeric" value="0">
-          </label>
-          <label class="gem-plan-field" for="gem-daily">
-            <span>Gems you plan to save each day</span>
-            <input id="gem-daily" type="number" min="0" step="1" inputmode="numeric" value="3">
-          </label>
-          <label class="gem-plan-field" for="gem-start-date">
-            <span>Saving since</span>
-            <input id="gem-start-date" type="date">
-          </label>
-        </div>
-
-        <div class="gem-target-grid" aria-live="polite">
-          <article class="gem-target-card" data-gem-target="new-year">
-            <div class="gem-target-heading">
-              <div>
-                <p class="gem-target-kicker">Seasonal banner</p>
-                <h3>New Year</h3>
-              </div>
-              <span class="gem-target-symbol" aria-hidden="true">✦</span>
-            </div>
-            <p class="gem-target-date" data-gem-target-date>—</p>
-            <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
-            <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
-          </article>
-
-          <article class="gem-target-card" data-gem-target="anniversary">
-            <div class="gem-target-heading">
-              <div>
-                <p class="gem-target-kicker">Major celebration</p>
-                <h3>Anniversary</h3>
-              </div>
-              <span class="gem-target-symbol anniversary-symbol" aria-hidden="true">◈</span>
-            </div>
-            <p class="gem-target-date" data-gem-target-date>—</p>
-            <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
-            <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
-          </article>
-
-          <article class="gem-target-card gem-target-custom" data-gem-target="custom">
-            <div class="gem-target-heading">
-              <div>
-                <p class="gem-target-kicker">Your target</p>
-                <label class="sr-only" for="gem-custom-name">Custom banner name</label>
-                <input id="gem-custom-name" class="gem-custom-name" type="text" value="Custom banner" maxlength="40" placeholder="Custom banner" autocomplete="off">
-              </div>
-              <span class="gem-target-symbol custom-symbol" aria-hidden="true">⌁</span>
-            </div>
-            <label class="sr-only" for="gem-custom-date">Custom banner date</label>
-            <input id="gem-custom-date" class="gem-custom-date" type="date">
-            <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
-            <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
-          </article>
-        </div>
-
-        <p id="gem-plan-summary" class="gem-plan-summary"></p>
       </section>
 
       <section class="collection-panel" aria-labelledby="collection-title">
@@ -206,6 +121,98 @@
         <div id="legend-grid" class="legend-grid" aria-live="polite"></div>
       </section>
     </main>
+
+    <div id="drawer-scrim" class="drawer-scrim" aria-hidden="true"></div>
+    <aside id="utility-drawer" class="utility-drawer" aria-labelledby="utility-drawer-title" aria-hidden="true" inert>
+      <div class="utility-drawer-panel">
+        <div class="utility-drawer-heading">
+          <div>
+            <p class="eyebrow">Legend locker</p>
+            <h2 id="utility-drawer-title">Planner &amp; tools</h2>
+          </div>
+          <button id="drawer-close" class="icon-button" type="button" aria-label="Close planner and tools">×</button>
+        </div>
+
+        <section class="drawer-tools" aria-labelledby="drawer-tools-title">
+          <h3 id="drawer-tools-title">Collection tools</h3>
+          <div>
+            <button id="backup-button" class="button button-secondary" type="button">Backup / restore</button>
+            <button id="reset-button" class="button button-danger" type="button">Reset progress</button>
+          </div>
+        </section>
+
+        <section class="gem-planner" aria-labelledby="gem-planner-title">
+          <div class="gem-planner-heading">
+            <div>
+              <p class="eyebrow">Banner planner</p>
+              <h2 id="gem-planner-title">Gem savings</h2>
+              <p>Set a daily goal, then check your next banner total.</p>
+            </div>
+            <p class="gem-planner-note">Estimates only—event dates can move.</p>
+          </div>
+
+          <div id="gem-planner-controls" class="gem-planner-controls">
+            <label class="gem-plan-field" for="gem-current">
+              <span>Gems now</span>
+              <input id="gem-current" type="number" min="0" step="1" inputmode="numeric" value="0">
+            </label>
+            <label class="gem-plan-field" for="gem-daily">
+              <span>Save / day</span>
+              <input id="gem-daily" type="number" min="0" step="1" inputmode="numeric" value="3">
+            </label>
+            <label class="gem-plan-field" for="gem-start-date">
+              <span>Saving since</span>
+              <input id="gem-start-date" type="date">
+            </label>
+          </div>
+
+          <div class="gem-target-grid" aria-live="polite">
+            <article class="gem-target-card" data-gem-target="new-year">
+              <div class="gem-target-heading">
+                <div>
+                  <p class="gem-target-kicker">Seasonal</p>
+                  <h3>New Year</h3>
+                </div>
+                <span class="gem-target-symbol" aria-hidden="true">✦</span>
+              </div>
+              <p class="gem-target-date" data-gem-target-date>—</p>
+              <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
+              <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
+            </article>
+
+            <article class="gem-target-card" data-gem-target="anniversary">
+              <div class="gem-target-heading">
+                <div>
+                  <p class="gem-target-kicker">Celebration</p>
+                  <h3>Anniversary</h3>
+                </div>
+                <span class="gem-target-symbol anniversary-symbol" aria-hidden="true">◈</span>
+              </div>
+              <p class="gem-target-date" data-gem-target-date>—</p>
+              <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
+              <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
+            </article>
+
+            <article class="gem-target-card gem-target-custom" data-gem-target="custom">
+              <div class="gem-target-heading">
+                <div>
+                  <p class="gem-target-kicker">Your target</p>
+                  <label class="sr-only" for="gem-custom-name">Custom banner name</label>
+                  <input id="gem-custom-name" class="gem-custom-name" type="text" value="Custom banner" maxlength="40" placeholder="Custom banner" autocomplete="off">
+                </div>
+                <span class="gem-target-symbol custom-symbol" aria-hidden="true">⌁</span>
+              </div>
+              <label class="sr-only" for="gem-custom-date">Custom banner date</label>
+              <input id="gem-custom-date" class="gem-custom-date" type="date">
+              <strong><span data-gem-target-total>0</span> <small>gems</small></strong>
+              <p class="gem-target-saving" data-gem-target-days>0 days of saving</p>
+            </article>
+          </div>
+
+          <p id="gem-plan-summary" class="gem-plan-summary"></p>
+        </section>
+      </div>
+    </aside>
   </div>
 
   <dialog id="backup-dialog" class="backup-dialog">
