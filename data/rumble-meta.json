@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "patch": "16.0.2",
+  "reviewedAt": "2026-09-12",
+  "source": {
+    "author": "Nydato",
+    "name": "OPTC Rumble & Grand Party Guides",
+    "url": "https://docs.google.com/spreadsheets/d/1IvYZjjs9SAMF9L_Wj9ql-5hqg5tgcOVNYvfFZSKWroI/edit?gid=475890873#gid=475890873",
+    "compsUrl": "https://docs.google.com/spreadsheets/d/1IvYZjjs9SAMF9L_Wj9ql-5hqg5tgcOVNYvfFZSKWroI/edit?gid=2096562606#gid=2096562606"
+  },
+  "updatePolicy": "Unit stats and tags refresh automatically. Main-lineup positions follow the reviewed guide; team tiers and replacement roles remain reviewed guidance after each meta update.",
+  "teams": [
+    {
+      "id": "qck-blackbeard",
+      "tier": "OP",
+      "name": "QCK / Blackbeard Pirates",
+      "facets": ["QCK", "Blackbeard Pirates", "Giant"],
+      "summary": "A high-pressure QCK shell with Blackbeard Pirate disruption and Giant coverage.",
+      "strength": "Special CT pressure, debuffs, and a durable frontline.",
+      "watch": "Keep the Blackbeard Pirate and Giant thresholds intact when swapping units.",
+      "checks": [
+        { "label": "5+ QCK units", "minimum": 5, "match": { "kind": "type", "values": ["QCK"] }, "required": true },
+        { "label": "3+ Blackbeard Pirates / Four Emperors", "minimum": 3, "match": { "kind": "tag", "values": ["Blackbeard Pirates", "Four Emperors"] }, "required": true },
+        { "label": "2+ Giants", "minimum": 2, "match": { "kind": "tag", "values": ["Giant"] }, "required": true }
+      ],
+      "slots": [
+        { "role": "Debuff opener", "unitId": 4600, "note": "Enemy stat and Special CT pressure.", "alternatives": [4449, 4609] },
+        { "role": "QCK support", "unitId": 4632, "note": "QCK utility and team support.", "alternatives": [4628] },
+        { "role": "Giant frontline", "unitId": 4629, "note": "Giant body and pressure.", "alternatives": [4622, 4640] },
+        { "role": "Anchor", "unitId": 4562, "note": "Blackbeard Pirate core and payoff.", "alternatives": [4522] },
+        { "role": "Disruptor", "unitId": 3637, "note": "Control and damage support.", "alternatives": [3726] },
+        { "role": "CT pressure", "unitId": 4608, "note": "Blackbeard Pirate Special CT utility.", "alternatives": [4609] },
+        { "role": "Giant flex", "unitId": 4622, "note": "Second Giant threshold slot.", "alternatives": [4598, 4629] },
+        { "role": "Damage flex", "unitId": 2930, "note": "Kuzan completes the source main lineup.", "alternatives": [3726, 4598, 4609] }
+      ]
+    },
+    {
+      "id": "str-five-elders",
+      "tier": "OP",
+      "name": "STR / Five Elders",
+      "facets": ["STR", "Five Elders", "Shooter"],
+      "summary": "A fast STR core that layers Five Elders pressure with flexible damage roles.",
+      "strength": "Broad STR buffs, strong opening turns, and reliable damage coverage.",
+      "watch": "The best variants depend on the current opponent field and your exact Five Elders options.",
+      "checks": [
+        { "label": "6+ STR units", "minimum": 6, "match": { "kind": "type", "values": ["STR"] }, "required": true },
+        { "label": "1+ Five Elders", "minimum": 1, "match": { "kind": "tag", "values": ["Five Elders"] }, "required": true },
+        { "label": "3+ Scientist / Logia / Zoan", "minimum": 3, "match": { "kind": "tag", "values": ["Scientist", "Logia-type", "Zoan-type"] }, "required": false }
+      ],
+      "slots": [
+        { "role": "Debuff opener", "unitId": 4482, "note": "Master Caesar's Scientist utility and disruption.", "alternatives": [4501, 4498, 4491] },
+        { "role": "Five Elders anchor", "unitId": 4571, "note": "Core World Government / Five Elders pressure.", "alternatives": [4453, 4491] },
+        { "role": "Shooter engine", "unitId": 4453, "note": "Five Elders damage engine.", "alternatives": [4547, 4560] },
+        { "role": "Red-Haired pressure", "unitId": 4560, "note": "Fast damage and tempo.", "alternatives": [4547, 3725] },
+        { "role": "Shooter flex", "unitId": 4547, "note": "Damage and role coverage.", "alternatives": [4453, 4264] },
+        { "role": "STR wall", "unitId": 3427, "note": "Kuma brings frontline durability to the main line.", "alternatives": [4433, 3725, 4498] },
+        { "role": "Utility flex", "unitId": 2930, "note": "Kuzan adds control and status support.", "alternatives": [4501, 4498, 4491] },
+        { "role": "Damage closer", "unitId": 3157, "note": "Sakazuki closes the source STR line.", "alternatives": [4433, 3725, 4560] }
+      ]
+    },
+    {
+      "id": "shooter",
+      "tier": "OP",
+      "name": "Shooter",
+      "facets": ["Shooter", "Cerebral", "STR"],
+      "summary": "A modern Shooter composition built around broad class synergy and backline pressure.",
+      "strength": "High damage density with several flexible control and protection slots.",
+      "watch": "Preserve the Shooter count before replacing a listed core with a generalist.",
+      "checks": [
+        { "label": "5+ Shooters", "minimum": 5, "match": { "kind": "class", "values": ["Shooter"] }, "required": true },
+        { "label": "3+ Cerebral units", "minimum": 3, "match": { "kind": "class", "values": ["Cerebral"] }, "required": false }
+      ],
+      "slots": [
+        { "role": "Shooter lead", "unitId": 4322, "note": "Primary Fighter/Shooter opener.", "alternatives": [4449, 4327] },
+        { "role": "Shooter engine", "unitId": 4307, "note": "Shooter/Cerebral team engine.", "alternatives": [4264, 4547] },
+        { "role": "Control", "unitId": 4264, "note": "Shooter control support.", "alternatives": [4048, 4501] },
+        { "role": "Damage flex", "unitId": 4547, "note": "Shooter damage support.", "alternatives": [4560, 4453] },
+        { "role": "Debuffer", "unitId": 4482, "note": "Master Caesar adds status and opposing-team pressure.", "alternatives": [4501, 4449, 4048] },
+        { "role": "Tempo", "unitId": 4560, "note": "Fast STR damage.", "alternatives": [4547, 4544] },
+        { "role": "Frontline", "unitId": 3427, "note": "Kuma adds durability to the Shooter shell.", "alternatives": [4433, 4327, 4453] },
+        { "role": "Elder payoff", "unitId": 3157, "note": "Sakazuki completes the source Shooter line.", "alternatives": [4453, 4449, 4327] }
+      ]
+    },
+    {
+      "id": "cerebral-free-spirit",
+      "tier": "SS",
+      "name": "Cerebral / Free Spirit",
+      "facets": ["Cerebral", "Free Spirit", "Scientist"],
+      "summary": "A flexible Cerebral / Free Spirit team that can pivot between protection, control, and burst.",
+      "strength": "Excellent role overlap, powerful utility, and several viable substitutions.",
+      "watch": "Do not break the Luffy & Bonney centerpiece or the class density needed by your chosen version.",
+      "checks": [
+        { "label": "Luffy & Bonney included", "minimum": 1, "match": { "kind": "unit", "values": [4490] }, "required": true },
+        { "label": "6+ Cerebral / Free Spirit", "minimum": 6, "match": { "kind": "class", "values": ["Cerebral", "Free Spirit"] }, "required": true },
+        { "label": "3+ Scientist / Logia / Zoan", "minimum": 3, "match": { "kind": "tag", "values": ["Scientist", "Logia-type", "Zoan-type"] }, "required": false }
+      ],
+      "slots": [
+        { "role": "Bonney protector", "unitId": 4371, "note": "Zoro opens the source Cerebral / Free Spirit line.", "alternatives": [4433, 4492, 4003] },
+        { "role": "Shooter/Cerebral engine", "unitId": 4307, "note": "Broad class support and utility.", "alternatives": [4560, 4501] },
+        { "role": "Centerpiece", "unitId": 4490, "note": "Required Luffy & Bonney core.", "alternatives": [] },
+        { "role": "Tempo", "unitId": 4560, "note": "Fast damage and Free Spirit support.", "alternatives": [4393, 4471] },
+        { "role": "Debuff flex", "unitId": 4482, "note": "Master Caesar supplies Scientist/Logia/Zoan coverage.", "alternatives": [4501, 4375, 4003] },
+        { "role": "Free Spirit support", "unitId": 4431, "note": "Jinbe adds Cerebral / Free Spirit utility.", "alternatives": [4471, 4206, 4393] },
+        { "role": "Giant utility", "unitId": 4192, "note": "Cerebral durability and Giant coverage.", "alternatives": [4629, 4622] },
+        { "role": "Cerebral burst", "unitId": 2930, "note": "Kuzan closes the source main lineup.", "alternatives": [4393, 4375, 4206] }
+      ]
+    },
+    {
+      "id": "navy-sword-fighter",
+      "tier": "SS",
+      "name": "Navy / SWORD Fighter",
+      "facets": ["Fighter", "Navy", "SWORD"],
+      "summary": "A tight Fighter shell that reaches the SWORD and Navy thresholds while retaining frontline pressure.",
+      "strength": "Reliable class checks, aggressive tempo, and a clearly defined replacement pool.",
+      "watch": "This team is threshold-sensitive: check Fighter/Navy, SWORD, and Fighter/Powerhouse counts after every swap.",
+      "checks": [
+        { "label": "5+ Fighter / Navy", "minimum": 5, "match": { "kind": "any", "values": ["Fighter", "Navy"] }, "required": true },
+        { "label": "3+ SWORD", "minimum": 3, "match": { "kind": "tag", "values": ["SWORD"] }, "required": true },
+        { "label": "6+ Fighter / Powerhouse", "minimum": 6, "match": { "kind": "class", "values": ["Fighter", "Powerhouse"] }, "required": true }
+      ],
+      "slots": [
+        { "role": "SWORD opener", "unitId": 4512, "note": "Fighter/Navy threshold starter.", "alternatives": [4525, 4528] },
+        { "role": "Fighter lead", "unitId": 4322, "note": "Fighter/Shooter opener.", "alternatives": [4449, 4330] },
+        { "role": "SWORD pressure", "unitId": 4366, "note": "Kizaru brings speed pressure to the source line.", "alternatives": [4521, 4525] },
+        { "role": "Navy anchor", "unitId": 4528, "note": "Prince Grus is the fourth fixed source position.", "alternatives": [4521, 4330] },
+        { "role": "SWORD support", "unitId": 4521, "note": "Garp & Coby provide Navy/Fighter payoff.", "alternatives": [4524, 4528] },
+        { "role": "SWORD flex", "unitId": 4523, "note": "Hibari preserves the source SWORD core.", "alternatives": [4524, 4525] },
+        { "role": "Fighter disruption", "unitId": 4524, "note": "Helmeppo completes the SWORD positions.", "alternatives": [4449, 4330, 4540] },
+        { "role": "Navy flex", "unitId": 4360, "note": "Sakazuki finishes the source Navy / SWORD line.", "alternatives": [4525, 4569, 4544] }
+      ]
+    },
+    {
+      "id": "int-control",
+      "tier": "SS",
+      "name": "INT Control",
+      "facets": ["INT", "Cerebral", "Free Spirit"],
+      "summary": "An INT-focused control shell that mixes strong disruption with Cerebral and Free Spirit tools.",
+      "strength": "Flexible answers to opposing setups and several interchangeable damage options.",
+      "watch": "Use the flex slots to answer the field, but retain enough INT units for the chosen setup.",
+      "checks": [
+        { "label": "5+ INT units", "minimum": 5, "match": { "kind": "type", "values": ["INT"] }, "required": true },
+        { "label": "3+ Cerebral / Free Spirit", "minimum": 3, "match": { "kind": "class", "values": ["Cerebral", "Free Spirit"] }, "required": false }
+      ],
+      "slots": [
+        { "role": "INT anchor", "unitId": 4564, "note": "INT control centerpiece.", "alternatives": [4109, 4294] },
+        { "role": "Cerebral pressure", "unitId": 4291, "note": "Sabo adds INT Cerebral/Fighter damage.", "alternatives": [4292, 4490, 4471] },
+        { "role": "INT protection", "unitId": 4492, "note": "Cerebral/Free Spirit protection.", "alternatives": [4433, 4490] },
+        { "role": "Center flex", "unitId": 4490, "note": "INT Free Spirit/Cerebral utility.", "alternatives": [4294, 4471] },
+        { "role": "Slasher damage", "unitId": 4482, "note": "Master Caesar adds INT control and disruption.", "alternatives": [4109, 4564, 4386] },
+        { "role": "Slasher damage", "unitId": 4109, "note": "S-Hawk adds INT damage and disruption.", "alternatives": [4501, 4294] },
+        { "role": "INT support", "unitId": 4386, "note": "Lilith & Vegaforce bring INT utility and class support.", "alternatives": [4294, 4490, 4492] },
+        { "role": "Control flex", "unitId": 3328, "note": "Smoker closes the source INT control lineup.", "alternatives": [4491, 4501, 4292] }
+      ]
+    }
+  ]
+}

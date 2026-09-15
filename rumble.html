@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="antonlabz">
+  <meta name="description" content="Source-ordered OPTC Pirate Rumble meta teams, replacement options, and roster-aware tag checks.">
+  <link rel="canonical" href="https://optc-checklist.vercel.app/rumble.html">
+  <title>OPTC Pirate Rumble Meta | Legend Locker</title>
+  <link rel="icon" type="image/x-icon" href="red.ico">
+  <link rel="stylesheet" href="css/style.css?v=rumble-meta-v3">
+
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/tags.js"></script>
+  <script src="js/lz-string.js?v=legend-locker"></script>
+  <script src="js/flairs.js?v=legend-locker-full-art"></script>
+  <script defer src="js/scripts.js?v=rumble-meta-v3"></script>
+</head>
+
+<body class="rumble-page">
+  <noscript>JavaScript is required to run this page.</noscript>
+
+  <div class="app-shell">
+    <main id="top" class="main-content">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="Return to OPTC Legend Locker">
+          <span class="brand-mark">OPTC</span>
+          <span>legend locker</span>
+        </a>
+        <div class="topbar-title">
+          <p class="eyebrow">Pirate Rumble</p>
+          <h2>PvP Meta Teams</h2>
+        </div>
+        <div class="topbar-actions">
+          <button id="theme-toggle" class="button button-secondary theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode"><span aria-hidden="true">◐</span><span data-theme-toggle-label>Dark mode</span></button>
+          <a class="button button-secondary" href="index.html">← Legend Locker</a>
+        </div>
+      </header>
+
+      <section id="rumble-meta" class="rumble-meta-section" aria-labelledby="rumble-meta-title">
+        <div class="rumble-meta-heading">
+          <div>
+            <p class="eyebrow">Current guide snapshot</p>
+            <h2 id="rumble-meta-title">Meta teams from your box.</h2>
+            <p>Each main lineup preserves the guide’s fixed eight-unit order. Use the linked bench below it to see appropriate replacements.</p>
+          </div>
+          <a id="rumble-source-link" class="button button-secondary rumble-source-link" href="https://docs.google.com/spreadsheets/d/1IvYZjjs9SAMF9L_Wj9ql-5hqg5tgcOVNYvfFZSKWroI/edit?gid=475890873#gid=475890873" target="_blank" rel="noreferrer">Nydato’s Rumble Sheet ↗</a>
+        </div>
+
+        <div class="rumble-meta-status" aria-label="Rumble meta data status">
+          <span><strong>Guide patch</strong> <span id="rumble-meta-patch">Loading…</span></span>
+          <span><strong>Reviewed</strong> <span id="rumble-meta-reviewed">Loading…</span></span>
+          <span><strong>Your PvP roster</strong> <span id="rumble-owned-count">0 / 0</span></span>
+        </div>
+
+        <aside class="rumble-credit" aria-label="Community guide credit">
+          <span class="rumble-credit-mark" aria-hidden="true">★</span>
+          <p><strong>Community guide credit: Nydato.</strong> Team archetypes and replacement roles are based on the public <a id="rumble-comps-link" href="https://docs.google.com/spreadsheets/d/1IvYZjjs9SAMF9L_Wj9ql-5hqg5tgcOVNYvfFZSKWroI/edit?gid=2096562606#gid=2096562606" target="_blank" rel="noreferrer">OPTC Rumble guide and comps sheet ↗</a>.</p>
+        </aside>
+
+        <div class="rumble-controls">
+          <label class="search-field rumble-search-field" for="rumble-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="rumble-search" type="search" placeholder="Search a team, role, tag, or unit" autocomplete="off">
+          </label>
+          <div id="rumble-filter-group" class="filter-group rumble-filter-group" role="group" aria-label="PvP meta availability filter">
+            <button class="filter-button is-active" type="button" data-rumble-filter="all" aria-pressed="true">All teams</button>
+            <button class="filter-button" type="button" data-rumble-filter="ready" aria-pressed="false">Ready core</button>
+            <button class="filter-button" type="button" data-rumble-filter="needs" aria-pressed="false">Needs units</button>
+          </div>
+          <button id="rumble-roster-toggle" class="button button-secondary" type="button" aria-controls="rumble-roster" aria-expanded="false">Edit PvP roster</button>
+        </div>
+
+        <div id="rumble-team-grid" class="rumble-team-grid" aria-live="polite">
+          <div class="rumble-empty"><strong>Loading PvP meta…</strong><span>Fetching the reviewed team snapshot.</span></div>
+        </div>
+
+        <div id="rumble-roster" class="rumble-roster" hidden>
+          <div class="rumble-roster-heading">
+            <div>
+              <p class="eyebrow">Roster editor</p>
+              <h3>Mark the PvP units you own.</h3>
+              <p>These use the same saved collection data as your Legend Locker.</p>
+            </div>
+            <span id="rumble-roster-count">0 shown</span>
+          </div>
+          <label class="search-field rumble-search-field" for="rumble-roster-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="rumble-roster-search" type="search" placeholder="Search referenced PvP units" autocomplete="off">
+          </label>
+          <div id="rumble-roster-grid" class="rumble-roster-grid" aria-live="polite"></div>
+        </div>
+
+        <p id="rumble-meta-feedback" class="rumble-meta-footnote">Stats and tags sync automatically. Team tiers remain reviewed guidance—always confirm in-game conditions before battling.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -8,14 +8,15 @@
   <link rel="canonical" href="https://optc-checklist.vercel.app">
   <title>OPTC Legend Locker</title>
   <link rel="icon" type="image/x-icon" href="red.ico">
-  <link rel="stylesheet" href="css/style.css?v=legend-locker-event-rewards-v3">
+  <link rel="stylesheet" href="css/style.css?v=rumble-meta-v3">
 
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/units.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/flags.js"></script>
   <script src="https://2shankz.github.io/optc-db.github.io/common/data/evolutions.js"></script>
+  <script src="https://2shankz.github.io/optc-db.github.io/common/data/tags.js"></script>
   <script src="js/lz-string.js?v=legend-locker"></script>
   <script src="js/flairs.js?v=legend-locker-full-art"></script>
-  <script defer src="js/scripts.js?v=legend-locker-event-rewards-v3"></script>
+  <script defer src="js/scripts.js?v=rumble-meta-v3"></script>
 </head>
 
 <body>
@@ -38,6 +39,8 @@
             <span>Shared preview</span>
             <button id="save-shared-copy" type="button">Save copy</button>
           </div>
+          <button id="theme-toggle" class="button button-secondary theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode"><span aria-hidden="true">◐</span><span data-theme-toggle-label>Dark mode</span></button>
+          <a class="button button-secondary pvp-meta-link" href="rumble.html">PvP meta</a>
           <button id="drawer-toggle" class="button button-secondary" type="button" aria-controls="utility-drawer" aria-expanded="false">Planner &amp; tools</button>
           <button class="button button-primary" id="share-button" type="button">Share collection</button>
         </div>
@@ -119,6 +122,15 @@
         </div>
 
         <div id="legend-grid" class="legend-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="pvp-meta-entry" aria-labelledby="pvp-meta-entry-title">
+        <div>
+          <p class="eyebrow">Pirate Rumble</p>
+          <h2 id="pvp-meta-entry-title">Build a PvP team from your box.</h2>
+          <p>Browse source-ordered meta lineups, linked replacement benches, and live tag checks on the dedicated PvP Meta page.</p>
+        </div>
+        <a class="button button-primary" href="rumble.html">Open PvP Meta ↗</a>
       </section>
     </main>
 

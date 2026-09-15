@@ -1,0 +1,1509 @@
+{
+  "schemaVersion": 1,
+  "metaSchemaVersion": 1,
+  "upstream": {
+    "dbVersion": 36,
+    "fetchedFrom": {
+      "units": "https://2shankz.github.io/optc-db.github.io/common/data/units.js",
+      "tags": "https://2shankz.github.io/optc-db.github.io/common/data/tags.js",
+      "version": "https://2shankz.github.io/optc-db.github.io/common/data/version.js",
+      "rumble": "https://2shankz.github.io/optc-db.github.io/common/data/rumble.json"
+    }
+  },
+  "generatedAt": "2026-09-15T12:36:44.324Z",
+  "units": {
+    "2930": {
+      "id": 2930,
+      "name": "Kuzan - Uncompromised Determination and Justice",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Shooter"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Admiral",
+        "Logia-type / Devil Fruit User",
+        "Fish-Man Island Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": null,
+        "attack": null,
+        "defense": null,
+        "speed": null,
+        "cost": null,
+        "specialCooldown": null
+      },
+      "hasRumbleData": false
+    },
+    "3157": {
+      "id": 3157,
+      "name": "Sakazuki - Uncompromised Determination and Justice",
+      "type": "STR",
+      "classes": [
+        "Fighter",
+        "Shooter"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Admiral",
+        "Logia-type / Devil Fruit User",
+        "Fish-Man Island Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 124,
+        "speed": 188,
+        "cost": 20,
+        "specialCooldown": 33
+      },
+      "hasRumbleData": true
+    },
+    "3328": {
+      "id": 3328,
+      "name": "Smoker - Striking a Warlord of the Sea",
+      "type": "INT",
+      "classes": [
+        "Striker",
+        "Driven"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Vice Admiral",
+        "Logia-type / Devil Fruit User",
+        "Punk Hazard Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 202,
+        "speed": 151,
+        "cost": 20,
+        "specialCooldown": 26
+      },
+      "hasRumbleData": true
+    },
+    "3427": {
+      "id": 3427,
+      "name": "Bartholomew Kuma - Destination of the Repel",
+      "type": "STR",
+      "classes": [
+        "Powerhouse",
+        "Shooter"
+      ],
+      "tags": [
+        "Former / Seven Warlords of the Sea",
+        "Former / Royalty",
+        "Paramythia-type / Devil Fruit User",
+        "Thriller Bark Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 187,
+        "speed": 119,
+        "cost": 20,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "3637": {
+      "id": 3637,
+      "name": "Charlotte Smoothie - Juice-Wringing General",
+      "type": "QCK",
+      "classes": [
+        "Powerhouse",
+        "Slasher"
+      ],
+      "tags": [
+        "Big Mom Pirates",
+        "Sweet 3 General",
+        "Former / Royalty",
+        "Paramythia-type / Devil Fruit User",
+        "Whole Cake Island Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 152,
+        "speed": 157,
+        "cost": 20,
+        "specialCooldown": 26
+      },
+      "hasRumbleData": true
+    },
+    "3725": {
+      "id": 3725,
+      "name": "Akainu - Three Admirals Defending Marineford",
+      "type": "STR",
+      "classes": [
+        "Driven",
+        "Fighter"
+      ],
+      "tags": [],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 135,
+        "speed": 160,
+        "cost": 30,
+        "specialCooldown": 32
+      },
+      "hasRumbleData": true
+    },
+    "3726": {
+      "id": 3726,
+      "name": "Aokiji - Three Admirals Defending Marineford",
+      "type": "QCK",
+      "classes": [
+        "Striker",
+        "Shooter"
+      ],
+      "tags": [],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 234,
+        "speed": 113,
+        "cost": 30,
+        "specialCooldown": 25
+      },
+      "hasRumbleData": true
+    },
+    "4003": {
+      "id": 4003,
+      "name": "Nami & Carina - Cat and Fox's Showtime",
+      "type": null,
+      "classes": [
+        "Free Spirit",
+        "Cerebral"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Gran Tesoro"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 130,
+        "speed": 177,
+        "cost": 55,
+        "specialCooldown": 24
+      },
+      "hasRumbleData": true
+    },
+    "4048": {
+      "id": 4048,
+      "name": "Shinobu & Raizo - Shinobis Protecting Wano",
+      "type": "STR",
+      "classes": [
+        "Shooter",
+        "Slasher"
+      ],
+      "tags": [
+        "Akazaya Nine",
+        "Paramythia-type / Devil Fruit User",
+        "Land of Wano Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 158,
+        "speed": 170,
+        "cost": 20,
+        "specialCooldown": 25
+      },
+      "hasRumbleData": true
+    },
+    "4109": {
+      "id": 4109,
+      "name": "S-Hawk",
+      "type": "INT",
+      "classes": [
+        "Slasher",
+        "Driven"
+      ],
+      "tags": [
+        "Seraphim",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 128,
+        "speed": 182,
+        "cost": 20,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4192": {
+      "id": 4192,
+      "name": "Jaguar D. Saul - Shouting the Future for a Friend",
+      "type": "PSY",
+      "classes": [
+        "Cerebral",
+        "Fighter"
+      ],
+      "tags": [
+        "Ohara",
+        "Giant",
+        "Enies Lobby Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 283,
+        "speed": 117,
+        "cost": 20,
+        "specialCooldown": 32
+      },
+      "hasRumbleData": true
+    },
+    "4206": {
+      "id": 4206,
+      "name": "Portgas D. Ace - Crew-Protecting Flame Fence",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Powerhouse"
+      ],
+      "tags": [
+        "Spade Pirates",
+        "Logia-type / Devil Fruit User",
+        "Marineford Paramount War Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 149,
+        "speed": 186,
+        "cost": 20,
+        "specialCooldown": 29
+      },
+      "hasRumbleData": true
+    },
+    "4264": {
+      "id": 4264,
+      "name": "Tsuru - Glaring at Swallow Island",
+      "type": "STR",
+      "classes": [
+        "Shooter",
+        "Cerebral"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Vice Admiral",
+        "Paramythia-type / Devil Fruit User",
+        "Dressrosa Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 208,
+        "speed": 166,
+        "cost": 20,
+        "specialCooldown": 22
+      },
+      "hasRumbleData": true
+    },
+    "4291": {
+      "id": 4291,
+      "name": "Sabo - Witnessed Truth at the Sacred Land",
+      "type": "INT",
+      "classes": [
+        "Cerebral",
+        "Fighter"
+      ],
+      "tags": [
+        "Revolutionary Army",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": null,
+        "attack": null,
+        "defense": null,
+        "speed": null,
+        "cost": null,
+        "specialCooldown": null
+      },
+      "hasRumbleData": false
+    },
+    "4292": {
+      "id": 4292,
+      "name": "Sabo - Ignited Flames of Revolution",
+      "type": "INT",
+      "classes": [
+        "Cerebral",
+        "Fighter"
+      ],
+      "tags": [
+        "Revolutionary Army",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 160,
+        "speed": 168,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4294": {
+      "id": 4294,
+      "name": "Hancock & Nami & Robin - Fragrance of the Bewitching Flowers",
+      "type": "INT",
+      "classes": [
+        "Free Spirit",
+        "Cerebral"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Kuja Pirates",
+        "Former / Seven Warlords of the Sea",
+        "Paramythia-type / Devil Fruit User"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 237,
+        "speed": 169,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4307": {
+      "id": 4307,
+      "name": "Usopp & Dr. Vegapunk \"Lilith the Evil\" - Controlling the Energy of the Sea",
+      "type": null,
+      "classes": [
+        "Shooter",
+        "Cerebral"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Egghead Arc",
+        "Vegapunk",
+        "Scientist"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 160,
+        "speed": 181,
+        "cost": 55,
+        "specialCooldown": 20
+      },
+      "hasRumbleData": true
+    },
+    "4322": {
+      "id": 4322,
+      "name": "Luffy & Lucci - Overlapping Guns",
+      "type": null,
+      "classes": [
+        "Fighter",
+        "Shooter"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Four Emperors",
+        "Worst Generation",
+        "Mythical Zoan-type / Devil Fruit User",
+        "Egghead Arc",
+        "CP0",
+        "World Government",
+        "Zoan-type / Devil Fruit User"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 132,
+        "speed": 214,
+        "cost": 55,
+        "specialCooldown": 31
+      },
+      "hasRumbleData": true
+    },
+    "4327": {
+      "id": 4327,
+      "name": "S-Bear - Defying Orders",
+      "type": "QCK",
+      "classes": [
+        "Fighter",
+        "Shooter"
+      ],
+      "tags": [
+        "Seraphim",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 173,
+        "speed": 201,
+        "cost": 20,
+        "specialCooldown": 29
+      },
+      "hasRumbleData": true
+    },
+    "4330": {
+      "id": 4330,
+      "name": "S-Shark - New Assaulting Weapon",
+      "type": "STR",
+      "classes": [
+        "Fighter",
+        "Powerhouse"
+      ],
+      "tags": [
+        "Seraphim",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "RCV",
+        "attack": null,
+        "defense": 50,
+        "speed": 100,
+        "cost": 40,
+        "specialCooldown": null
+      },
+      "hasRumbleData": false
+    },
+    "4360": {
+      "id": 4360,
+      "name": "Sakazuki - Intercepting Fleet Admiral",
+      "type": "PSY",
+      "classes": [
+        "Fighter",
+        "Striker"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Fleet Admiral",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 128,
+        "speed": 199,
+        "cost": 20,
+        "specialCooldown": 30
+      },
+      "hasRumbleData": true
+    },
+    "4366": {
+      "id": 4366,
+      "name": "Kizaru - Cloud-Splitting Light Sword",
+      "type": "DEX",
+      "classes": [
+        "Shooter",
+        "Slasher"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Admiral",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 128,
+        "speed": 216,
+        "cost": 55,
+        "specialCooldown": 20
+      },
+      "hasRumbleData": true
+    },
+    "4371": {
+      "id": 4371,
+      "name": "Roronoa Zoro - Aiming for the Pinnacle",
+      "type": "QCK",
+      "classes": [
+        "Slasher",
+        "Driven"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Worst Generation"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 194,
+        "speed": 168,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4375": {
+      "id": 4375,
+      "name": "Nico Robin - Gratitude to the Ship Doctor",
+      "type": "PSY",
+      "classes": [
+        "Cerebral",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 156,
+        "speed": 166,
+        "cost": 20,
+        "specialCooldown": 27
+      },
+      "hasRumbleData": true
+    },
+    "4386": {
+      "id": 4386,
+      "name": "Dr. Vegapunk \"Lilith the Evil\" & Vegaforce-01 - Ship-Carrying Giant Robot",
+      "type": "INT",
+      "classes": [
+        "Cerebral",
+        "Striker"
+      ],
+      "tags": [
+        "Vegapunk",
+        "Scientist",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 172,
+        "speed": 175,
+        "cost": 20,
+        "specialCooldown": 30
+      },
+      "hasRumbleData": true
+    },
+    "4393": {
+      "id": 4393,
+      "name": "Sabo & Koala - Aces Leading the Revolution",
+      "type": null,
+      "classes": [
+        "Free Spirit",
+        "Cerebral"
+      ],
+      "tags": [
+        "Revolutionary Army",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 201,
+        "speed": 190,
+        "cost": 55,
+        "specialCooldown": 29
+      },
+      "hasRumbleData": true
+    },
+    "4431": {
+      "id": 4431,
+      "name": "Jinbe - Path-Clearing Fish-Man Karate",
+      "type": "PSY",
+      "classes": [
+        "Cerebral",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Former / Seven Warlords of the Sea",
+        "Fish-Man",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 210,
+        "speed": 151,
+        "cost": 20,
+        "specialCooldown": 30
+      },
+      "hasRumbleData": true
+    },
+    "4433": {
+      "id": 4433,
+      "name": "Bartholomew Kuma - Daughter-Protecting Hero",
+      "type": "STR",
+      "classes": [
+        "Free Spirit",
+        "Powerhouse"
+      ],
+      "tags": [
+        "Revolutionary Army",
+        "Former / Seven Warlords of the Sea",
+        "Former / Royalty",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 166,
+        "speed": 167,
+        "cost": 55,
+        "specialCooldown": 32
+      },
+      "hasRumbleData": true
+    },
+    "4449": {
+      "id": 4449,
+      "name": "S-Snake - Mesmerizing Wink",
+      "type": "QCK",
+      "classes": [
+        "Fighter",
+        "Driven"
+      ],
+      "tags": [
+        "Seraphim",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 138,
+        "speed": 173,
+        "cost": 20,
+        "specialCooldown": 24
+      },
+      "hasRumbleData": true
+    },
+    "4453": {
+      "id": 4453,
+      "name": "St. Marcus Mars - Godhead of Environment of the Five Elders, the Highest Authority of the World Government",
+      "type": "STR",
+      "classes": [
+        "Driven",
+        "Shooter"
+      ],
+      "tags": [
+        "World Government",
+        "Celestial Dragon",
+        "Five Elders",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 198,
+        "speed": 144,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4471": {
+      "id": 4471,
+      "name": "Jinbe - Escaping with the Swordsman",
+      "type": "INT",
+      "classes": [
+        "Free Spirit",
+        "Cerebral"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Fish-Man",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 50,
+        "speed": 100,
+        "cost": 30,
+        "specialCooldown": null
+      },
+      "hasRumbleData": false
+    },
+    "4482": {
+      "id": 4482,
+      "name": "Master Caesar Clown - Scientist Wreathed in Toxic Gas",
+      "type": "DEX",
+      "classes": [
+        "Cerebral",
+        "Driven"
+      ],
+      "tags": [
+        "Scientist",
+        "Logia-type / Devil Fruit User",
+        "Punk Hazard Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 191,
+        "speed": 147,
+        "cost": 20,
+        "specialCooldown": 25
+      },
+      "hasRumbleData": true
+    },
+    "4490": {
+      "id": 4490,
+      "name": "Luffy & Bonney",
+      "type": "INT",
+      "classes": [
+        "Free Spirit",
+        "Cerebral"
+      ],
+      "tags": [
+        "Straw Hat Pirates",
+        "Bonney Pirates",
+        "Four Emperors",
+        "Worst Generation",
+        "Former / Royalty",
+        "Mythical Zoan-type / Devil Fruit User",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 128,
+        "speed": 215,
+        "cost": 55,
+        "specialCooldown": 27
+      },
+      "hasRumbleData": true
+    },
+    "4491": {
+      "id": 4491,
+      "name": "St. Jaygarcia Saturn - Summoning Highest Authority",
+      "type": "STR",
+      "classes": [
+        "Driven",
+        "Cerebral"
+      ],
+      "tags": [
+        "World Government",
+        "Celestial Dragon",
+        "Five Elders",
+        "Scientist",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 155,
+        "speed": 179,
+        "cost": 55,
+        "specialCooldown": 30
+      },
+      "hasRumbleData": true
+    },
+    "4492": {
+      "id": 4492,
+      "name": "Bartholomew Kuma - Weak-Willed Pacifist",
+      "type": "INT",
+      "classes": [
+        "Cerebral",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Former / Seven Warlords of the Sea",
+        "Former / Royalty",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "RCV",
+        "attack": null,
+        "defense": 174,
+        "speed": 142,
+        "cost": 55,
+        "specialCooldown": 40
+      },
+      "hasRumbleData": true
+    },
+    "4498": {
+      "id": 4498,
+      "name": "Stussy - Carrying Out the Final Job",
+      "type": "STR",
+      "classes": [
+        "Driven",
+        "Cerebral"
+      ],
+      "tags": [
+        "Zoan-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 199,
+        "speed": 175,
+        "cost": 20,
+        "specialCooldown": 25
+      },
+      "hasRumbleData": true
+    },
+    "4501": {
+      "id": 4501,
+      "name": "Caesar Clown - Laughing at Slaughter",
+      "type": "STR",
+      "classes": [
+        "Cerebral",
+        "Driven"
+      ],
+      "tags": [
+        "Scientist",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 50,
+        "speed": 100,
+        "cost": 30,
+        "specialCooldown": null
+      },
+      "hasRumbleData": false
+    },
+    "4512": {
+      "id": 4512,
+      "name": "Kujaku - Discipline-Woman of SWORD",
+      "type": "PSY",
+      "classes": [
+        "Slasher",
+        "Fighter"
+      ],
+      "tags": [
+        "SWORD",
+        "Former / Navy",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 209,
+        "speed": 137,
+        "cost": 20,
+        "specialCooldown": 26
+      },
+      "hasRumbleData": true
+    },
+    "4521": {
+      "id": 4521,
+      "name": "Garp & Coby - Combined Fists of Mentor and Protege",
+      "type": null,
+      "classes": [
+        "Fighter",
+        "Powerhouse"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Vice Admiral",
+        "Egghead Arc",
+        "SWORD"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 180,
+        "speed": 185,
+        "cost": 55,
+        "specialCooldown": 31
+      },
+      "hasRumbleData": true
+    },
+    "4522": {
+      "id": 4522,
+      "name": "Blackbeard & Kuzan - Common Interests",
+      "type": null,
+      "classes": [
+        "Driven",
+        "Shooter"
+      ],
+      "tags": [
+        "Blackbeard Pirates",
+        "Four Emperors",
+        "Worst Generation",
+        "Logia-type / Devil Fruit User",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc",
+        "Former / Navy"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 237,
+        "speed": 166,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4523": {
+      "id": 4523,
+      "name": "Hibari - Sniper of SWORD",
+      "type": "DEX",
+      "classes": [
+        "Shooter",
+        "Fighter"
+      ],
+      "tags": [
+        "SWORD",
+        "Former / Navy",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 146,
+        "speed": 149,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4524": {
+      "id": 4524,
+      "name": "Helmeppo - Falling Back to Protect Them",
+      "type": "DEX",
+      "classes": [
+        "Slasher",
+        "Fighter"
+      ],
+      "tags": [
+        "SWORD",
+        "Former / Navy",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 225,
+        "speed": 125,
+        "cost": 20,
+        "specialCooldown": 31
+      },
+      "hasRumbleData": true
+    },
+    "4525": {
+      "id": 4525,
+      "name": "Doll - Navy HQ Vice Admirals Vanguard",
+      "type": "DEX",
+      "classes": [
+        "Fighter",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Vice Admiral",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 130,
+        "speed": 177,
+        "cost": 20,
+        "specialCooldown": 35
+      },
+      "hasRumbleData": true
+    },
+    "4528": {
+      "id": 4528,
+      "name": "Prince Grus - Battleship-Protecting Prince of SWORD",
+      "type": "DEX",
+      "classes": [
+        "Powerhouse",
+        "Fighter"
+      ],
+      "tags": [
+        "SWORD",
+        "Former / Navy",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 286,
+        "speed": 118,
+        "cost": 20,
+        "specialCooldown": 29
+      },
+      "hasRumbleData": true
+    },
+    "4540": {
+      "id": 4540,
+      "name": "Rob Lucci - Final Strike Against the Swordsman",
+      "type": "DEX",
+      "classes": [
+        "Free Spirit",
+        "Powerhouse"
+      ],
+      "tags": [
+        "CP0",
+        "World Government",
+        "Zoan-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 130,
+        "speed": 157,
+        "cost": 20,
+        "specialCooldown": 32
+      },
+      "hasRumbleData": true
+    },
+    "4544": {
+      "id": 4544,
+      "name": "Kizaru - Overwhelming Grief",
+      "type": "INT",
+      "classes": [
+        "Slasher",
+        "Cerebral"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Admiral",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 154,
+        "speed": 155,
+        "cost": 55,
+        "specialCooldown": 23
+      },
+      "hasRumbleData": true
+    },
+    "4547": {
+      "id": 4547,
+      "name": "Beckman & Yasopp",
+      "type": "STR",
+      "classes": [
+        "Cerebral",
+        "Shooter"
+      ],
+      "tags": [
+        "Red-Haired Pirates",
+        "Elbaph Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 142,
+        "speed": 168,
+        "cost": 55,
+        "specialCooldown": 50
+      },
+      "hasRumbleData": true
+    },
+    "4560": {
+      "id": 4560,
+      "name": "Red-Haired Shanks - Emperor and Captain of the Red-Hair Pirates",
+      "type": "STR",
+      "classes": [
+        "Cerebral",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Red-Haired Pirates",
+        "Former / Roger Pirates",
+        "Four Emperors",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 158,
+        "speed": 174,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4562": {
+      "id": 4562,
+      "name": "Blackbeard - Emperor and Commodore of the Blackbeard Pirates",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Driven"
+      ],
+      "tags": [
+        "Blackbeard Pirates",
+        "Former / Whitebeard Pirates",
+        "Four Emperors",
+        "Worst Generation",
+        "Former / Seven Warlords of the Sea",
+        "Logia-type / Devil Fruit User",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 230,
+        "speed": 159,
+        "cost": 55,
+        "specialCooldown": 35
+      },
+      "hasRumbleData": true
+    },
+    "4564": {
+      "id": 4564,
+      "name": "Buggy the Genius Jester - Emperor and Chairman of the Cross Guild",
+      "type": "INT",
+      "classes": [
+        "Slasher",
+        "Driven"
+      ],
+      "tags": [
+        "Former / Roger Pirates",
+        "Four Emperors",
+        "Former / Seven Warlords of the Sea",
+        "Cross Guild",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 285,
+        "speed": 130,
+        "cost": 55,
+        "specialCooldown": 28
+      },
+      "hasRumbleData": true
+    },
+    "4569": {
+      "id": 4569,
+      "name": "Sakazuki - Navy Fleet Admiral Glaring in Silence",
+      "type": "INT",
+      "classes": [
+        "Driven",
+        "Slasher"
+      ],
+      "tags": [
+        "Former / Navy",
+        "Navy Fleet Admiral",
+        "Logia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 159,
+        "speed": 148,
+        "cost": 20,
+        "specialCooldown": 50
+      },
+      "hasRumbleData": true
+    },
+    "4571": {
+      "id": 4571,
+      "name": "Imu - Occupant of the Empty Throne",
+      "type": "STR",
+      "classes": [
+        "Powerhouse",
+        "Driven"
+      ],
+      "tags": [
+        "World Government",
+        "Celestial Dragon",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 160,
+        "speed": 198,
+        "cost": 55,
+        "specialCooldown": 99
+      },
+      "hasRumbleData": true
+    },
+    "4598": {
+      "id": 4598,
+      "name": "Avalo Pizarro & Vasco Shot & San Juan Wolf",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Powerhouse"
+      ],
+      "tags": [
+        "Blackbeard Pirates",
+        "Giant",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 164,
+        "speed": 168,
+        "cost": 55,
+        "specialCooldown": 24
+      },
+      "hasRumbleData": true
+    },
+    "4600": {
+      "id": 4600,
+      "name": "Shiryu - A Hidden Blade That Exploits the Opening",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Slasher"
+      ],
+      "tags": [
+        "Blackbeard Pirates",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 123,
+        "speed": 199,
+        "cost": 20,
+        "specialCooldown": 26
+      },
+      "hasRumbleData": true
+    },
+    "4608": {
+      "id": 4608,
+      "name": "Lafitte - Infiltrating Fifth Ship Captain of the Blackbeard Pirates",
+      "type": "QCK",
+      "classes": [
+        "Striker",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Blackbeard Pirates",
+        "Elbaph Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DBF",
+        "attack": null,
+        "defense": 116,
+        "speed": 195,
+        "cost": 55,
+        "specialCooldown": 17
+      },
+      "hasRumbleData": true
+    },
+    "4609": {
+      "id": 4609,
+      "name": "Doc Q - Apparent Fatigue",
+      "type": "QCK",
+      "classes": [
+        "Striker",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Blackbeard Pirates",
+        "Paramythia-type / Devil Fruit User",
+        "Egghead Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 50,
+        "speed": 100,
+        "cost": 30,
+        "specialCooldown": null
+      },
+      "hasRumbleData": false
+    },
+    "4622": {
+      "id": 4622,
+      "name": "Beardhill Jarul",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Powerhouse"
+      ],
+      "tags": [
+        "Giant",
+        "Elbaph Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "DEF",
+        "attack": null,
+        "defense": 281,
+        "speed": 108,
+        "cost": 20,
+        "specialCooldown": 26
+      },
+      "hasRumbleData": true
+    },
+    "4628": {
+      "id": 4628,
+      "name": "Vinsmoke Reiju - Waterside Butterfly Smiling in the Moonlight",
+      "type": "QCK",
+      "classes": [
+        "Cerebral",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Germa 66",
+        "Former / Royalty"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 245,
+        "speed": 149,
+        "cost": 55,
+        "specialCooldown": 26
+      },
+      "hasRumbleData": true
+    },
+    "4629": {
+      "id": 4629,
+      "name": "Loki - Sun God who Brings the World to an End",
+      "type": "QCK",
+      "classes": [
+        "Driven",
+        "Free Spirit"
+      ],
+      "tags": [
+        "Ancient Giant",
+        "Former / Royalty",
+        "Giant",
+        "Elbaph Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 120,
+        "speed": 195,
+        "cost": 55,
+        "specialCooldown": 34
+      },
+      "hasRumbleData": true
+    },
+    "4632": {
+      "id": 4632,
+      "name": "Nefeltari Vivi from ONE PIECE magazine - Proud Samurai-Style Warrior",
+      "type": "QCK",
+      "classes": [
+        "Free Spirit",
+        "Slasher"
+      ],
+      "tags": [
+        "Former / Royalty"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "SPT",
+        "attack": null,
+        "defense": 159,
+        "speed": 169,
+        "cost": 55,
+        "specialCooldown": 25
+      },
+      "hasRumbleData": true
+    },
+    "4640": {
+      "id": 4640,
+      "name": "Devil Oars - Legend Revived After 500 Years",
+      "type": "INT",
+      "classes": [
+        "Powerhouse",
+        "Striker"
+      ],
+      "tags": [
+        "Thriller Bark Pirates",
+        "Ancient Giant",
+        "Giant",
+        "Thriller Bark Arc"
+      ],
+      "missingFromUnitData": false,
+      "stats": {
+        "style": "ATK",
+        "attack": null,
+        "defense": 172,
+        "speed": 160,
+        "cost": 20,
+        "specialCooldown": 32
+      },
+      "hasRumbleData": true
+    }
+  }
+}

@@ -3,6 +3,15 @@
 
   var STORAGE_KEY = 'optc-legend-progress-v2';
   var GEM_PLAN_STORAGE_KEY = 'optc-gem-savings-plan-v1';
+  var THEME_STORAGE_KEY = 'optc-legend-theme-v1';
+  var RUMBLE_META_URL = 'data/rumble-meta.json';
+  var RUMBLE_META_UNITS_URL = 'data/rumble-meta-units.json';
+  var RUMBLE_TAG_ALIASES = {
+    'navy': ['navy', 'former / navy'],
+    'royalty': ['royalty', 'former / royalty'],
+    'logia-type': ['logia-type', 'logia-type / devil fruit user'],
+    'zoan-type': ['zoan-type', 'zoan-type / devil fruit user']
+  };
   var LEGACY_STORAGE_KEYS = ['evohidden'];
   var GEM_TARGETS = {
     'new-year': { month: 0, day: 1 },
@@ -25,11 +34,21 @@
     legends: [],
     progress: {},
     sharedPreview: false,
+    theme: 'light',
     gemPlan: null,
     gemEvents: [],
     gemEventsMeta: null,
     gemEventsLoading: true,
     gemEventsError: false,
+    rumbleMeta: null,
+    rumbleUnits: {},
+    rumbleMetaLoading: true,
+    rumbleMetaError: false,
+    rumbleUnitsError: false,
+    rumbleFilter: 'all',
+    rumbleSearch: '',
+    rumbleRosterSearch: '',
+    rumbleRosterOpen: false,
     drawerOpen: false,
     view: 'gallery',
     galleryEditId: null,
@@ -44,6 +63,45 @@
 
   function byId(id) {
     return document.getElementById(id);
+  }
+
+  function resolveTheme() {
+    try {
+      var saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === 'light' || saved === 'dark') return saved;
+    } catch (error) {
+    }
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme) {
+    var next = theme === 'dark' ? 'dark' : 'light';
+    var label = next === 'dark' ? 'Light mode' : 'Dark mode';
+
+    state.theme = next;
+    document.documentElement.dataset.theme = next;
+    if (!elements.themeToggle) return;
+
+    elements.themeToggle.setAttribute('aria-pressed', String(next === 'dark'));
+    elements.themeToggle.setAttribute('aria-label', 'Switch to ' + label.toLocaleLowerCase());
+    if (elements.themeToggleLabel) elements.themeToggleLabel.textContent = label;
+  }
+
+  function loadTheme() {
+    applyTheme(resolveTheme());
+  }
+
+  function toggleTheme() {
+    var next = state.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch (error) {
+    }
+  }
+
+  function bindThemeToggle() {
+    if (elements.themeToggle) elements.themeToggle.addEventListener('click', toggleTheme);
   }
 
   function clampLlb(value) {
@@ -143,7 +201,7 @@
     } else {
       return;
     }
-    renderGrid();
+    renderCurrentPage();
   }
 
   function saveProgress() {
@@ -607,6 +665,640 @@
       });
   }
 
+  function flattenRumbleStrings(value, all) {
+    var values = all || [];
+    if (Array.isArray(value)) {
+      value.forEach(function (entry) { flattenRumbleStrings(entry, values); });
+      return values;
+    }
+    if (typeof value === 'string') {
+      var next = value.trim();
+      if (next && values.indexOf(next) === -1) values.push(next);
+    }
+    return values;
+  }
+
+  function normaliseRumbleText(value) {
+    return String(value || '')
+      .toLocaleLowerCase()
+      .replace(/[\[\]]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function rumbleNumber(value) {
+    var number = Number(value);
+    return Number.isFinite(number) ? number : null;
+  }
+
+  function getRumbleUnit(id) {
+    var numericId = Number(id);
+    var snapshot = state.rumbleUnits[String(numericId)] || {};
+    var upstream = window.units && window.units[numericId] ? window.units[numericId] : {};
+    var snapshotStats = snapshot.stats && typeof snapshot.stats === 'object' ? snapshot.stats : {};
+    var upstreamTags = window.tags && window.tags[numericId] ? window.tags[numericId] : [];
+    var classes = flattenRumbleStrings(snapshot.classes);
+    var tags = flattenRumbleStrings(snapshot.tags);
+
+    if (!classes.length) classes = flattenRumbleStrings(upstream.class);
+    if (!tags.length) tags = flattenRumbleStrings(upstreamTags);
+
+    return {
+      id: numericId,
+      name: snapshot.name || (upstream.name ? String(upstream.name) : 'Unit #' + numericId),
+      type: snapshot.type || (upstream.type ? String(upstream.type) : null),
+      classes: classes,
+      tags: tags,
+      missingFromUnitData: Boolean(snapshot.missingFromUnitData),
+      hasRumbleData: Boolean(snapshot.hasRumbleData),
+      stats: {
+        style: snapshotStats.style ? String(snapshotStats.style) : null,
+        attack: rumbleNumber(snapshotStats.attack),
+        defense: rumbleNumber(snapshotStats.defense),
+        speed: rumbleNumber(snapshotStats.speed),
+        cost: rumbleNumber(snapshotStats.cost),
+        specialCooldown: rumbleNumber(snapshotStats.specialCooldown)
+      }
+    };
+  }
+
+  function getRumbleUnitIds() {
+    var ids = [];
+    var seen = {};
+    var teams = state.rumbleMeta && Array.isArray(state.rumbleMeta.teams) ? state.rumbleMeta.teams : [];
+
+    teams.forEach(function (team) {
+      (team.slots || []).forEach(function (slot) {
+        [slot.unitId].concat(slot.alternatives || []).forEach(function (id) {
+          var numericId = Number(id);
+          if (!Number.isInteger(numericId) || numericId < 1 || seen[numericId]) return;
+          seen[numericId] = true;
+          ids.push(numericId);
+        });
+      });
+    });
+
+    return ids;
+  }
+
+  function isRumbleUnitOwned(id) {
+    var progress = state.progress[String(id)];
+    return Boolean(progress && normaliseProgressEntry(progress).owned);
+  }
+
+  function rumbleTextMatches(actual, expected) {
+    var actualText = normaliseRumbleText(actual);
+    var expectedText = normaliseRumbleText(expected);
+    if (!actualText || !expectedText) return false;
+
+    var aliases = RUMBLE_TAG_ALIASES[expectedText] || [expectedText];
+    return aliases.some(function (alias) {
+      return actualText === alias || actualText.indexOf(alias) !== -1;
+    });
+  }
+
+  function unitMatchesRumbleMatch(unit, match) {
+    var values = match && Array.isArray(match.values) ? match.values : [];
+    var kind = match && match.kind ? match.kind : 'any';
+
+    if (kind === 'unit') {
+      return values.some(function (value) { return String(unit.id) === String(value); });
+    }
+
+    return values.some(function (value) {
+      var typeMatch = rumbleTextMatches(unit.type, value);
+      var classMatch = unit.classes.some(function (entry) { return rumbleTextMatches(entry, value); });
+      var tagMatch = unit.tags.some(function (entry) { return rumbleTextMatches(entry, value); });
+
+      if (kind === 'type') return typeMatch;
+      if (kind === 'class') return classMatch;
+      if (kind === 'tag') return tagMatch;
+      return typeMatch || classMatch || tagMatch;
+    });
+  }
+
+  function getRumbleTeamAvailability(team) {
+    var usedIds = {};
+    var slots = (team.slots || []).map(function (slot) {
+      var options = [];
+      [slot.unitId].concat(slot.alternatives || []).forEach(function (id) {
+        var numericId = Number(id);
+        if (Number.isInteger(numericId) && numericId > 0 && options.indexOf(numericId) === -1) options.push(numericId);
+      });
+
+      var selectedId = null;
+      options.some(function (id) {
+        if (!usedIds[id] && isRumbleUnitOwned(id)) {
+          selectedId = id;
+          usedIds[id] = true;
+          return true;
+        }
+        return false;
+      });
+
+      return {
+        slot: slot,
+        primaryId: Number(slot.unitId),
+        selectedId: selectedId,
+        usesReplacement: selectedId !== null && selectedId !== Number(slot.unitId)
+      };
+    });
+    var selectedUnits = slots.filter(function (slot) { return slot.selectedId !== null; }).map(function (slot) {
+      return getRumbleUnit(slot.selectedId);
+    });
+    var checks = (team.checks || []).map(function (check) {
+      var minimum = Math.max(1, Number(check.minimum) || 1);
+      var count = selectedUnits.filter(function (unit) { return unitMatchesRumbleMatch(unit, check.match); }).length;
+      return {
+        label: check.label || 'Setup check',
+        minimum: minimum,
+        required: check.required !== false,
+        count: count,
+        passed: count >= minimum
+      };
+    });
+    var missingSlots = slots.filter(function (slot) { return slot.selectedId === null; }).length;
+    var requiredChecksPass = checks.filter(function (check) { return check.required; }).every(function (check) { return check.passed; });
+
+    return {
+      slots: slots,
+      checks: checks,
+      filled: selectedUnits.length,
+      total: slots.length,
+      missingSlots: missingSlots,
+      ready: missingSlots === 0 && requiredChecksPass
+    };
+  }
+
+  function createRumbleElement(tagName, className, content) {
+    var element = document.createElement(tagName);
+    if (className) element.className = className;
+    if (content !== undefined && content !== null) element.textContent = String(content);
+    return element;
+  }
+
+  function getRumbleIconUrl(id) {
+    return window.getLegendIconUrl ? window.getLegendIconUrl(id) : 'images/icons/' + id + '.png';
+  }
+
+  function buildRumbleStatLine(unit) {
+    var parts = [];
+    if (unit.type) parts.push(unit.type);
+    if (unit.classes.length) parts.push(unit.classes.slice(0, 2).join(' / '));
+    return parts.length ? parts.join(' · ') : 'PvP data pending';
+  }
+
+  function buildRumbleMetricsLine(unit) {
+    var parts = ['#' + unit.id];
+    if (unit.stats.defense !== null) parts.push('DEF ' + unit.stats.defense);
+    if (unit.stats.speed !== null) parts.push('SPD ' + unit.stats.speed);
+    if (unit.stats.specialCooldown !== null) parts.push('CT ' + unit.stats.specialCooldown);
+    return parts.join(' · ');
+  }
+
+  function buildRumbleUnitControl(unit, options) {
+    var config = options || {};
+    var owned = isRumbleUnitOwned(unit.id);
+    var button = createRumbleElement('button', 'rumble-unit-control');
+    var image = createRumbleElement('img', 'rumble-unit-art');
+    var copy = createRumbleElement('span', 'rumble-unit-copy');
+    var name = createRumbleElement('strong', 'rumble-unit-name', unit.name);
+    var meta = createRumbleElement('small', 'rumble-unit-meta', buildRumbleStatLine(unit));
+    var id = createRumbleElement('small', 'rumble-unit-id', buildRumbleMetricsLine(unit));
+    var tooltipParts = [];
+
+    button.type = 'button';
+    button.dataset.rumbleUnitId = String(unit.id);
+    button.classList.toggle('is-owned', owned);
+    button.classList.toggle('is-missing', Boolean(config.missing));
+    button.classList.toggle('is-replacement', Boolean(config.isReplacement));
+    button.classList.toggle('is-compact', Boolean(config.compact));
+    button.classList.toggle('is-lineup', Boolean(config.lineup));
+    button.classList.toggle('is-bench-ready', Boolean(config.benchReady));
+    button.setAttribute('aria-pressed', String(owned));
+    button.setAttribute('aria-label', (owned ? 'Remove ' : 'Mark ') + unit.name + (owned ? ' from' : ' as part of') + ' your PvP roster');
+    button.disabled = state.sharedPreview;
+
+    if (unit.type) tooltipParts.push(unit.type);
+    if (unit.classes.length) tooltipParts.push(unit.classes.join(' / '));
+    if (unit.tags.length) tooltipParts.push('Tags: ' + unit.tags.join(', '));
+    button.title = unit.name + (tooltipParts.length ? ' · ' + tooltipParts.join(' · ') : '');
+
+    image.src = getRumbleIconUrl(unit.id);
+    image.alt = '';
+    image.loading = 'lazy';
+    image.onerror = function () {
+      this.onerror = null;
+      this.src = 'images/icons/' + unit.id + '.png';
+    };
+
+    copy.appendChild(name);
+    copy.appendChild(meta);
+    copy.appendChild(id);
+    button.appendChild(image);
+    button.appendChild(copy);
+    return button;
+  }
+
+  function buildRumbleLineupPosition(slotStatus, index) {
+    var slot = slotStatus.slot;
+    var position = createRumbleElement('article', 'rumble-lineup-position');
+    var heading = createRumbleElement('div', 'rumble-lineup-position-heading');
+    var label = createRumbleElement('div', 'rumble-lineup-position-label');
+    var indexBadge = createRumbleElement('span', 'rumble-slot-index', String(index + 1));
+    var role = createRumbleElement('strong', 'rumble-slot-role', slot.role || 'Flex role');
+    var status = createRumbleElement('span', 'rumble-lineup-status');
+    var primary = getRumbleUnit(slotStatus.primaryId);
+    var control = buildRumbleUnitControl(primary, {
+      lineup: true,
+      missing: slotStatus.selectedId === null,
+      benchReady: slotStatus.usesReplacement
+    });
+
+    position.dataset.rumbleSlot = String(index + 1);
+    position.dataset.rumblePrimaryId = String(slotStatus.primaryId);
+    position.classList.toggle('is-missing', slotStatus.selectedId === null);
+    position.classList.toggle('is-bench-ready', slotStatus.usesReplacement);
+    position.classList.toggle('is-core-owned', slotStatus.selectedId === slotStatus.primaryId);
+
+    if (slotStatus.selectedId === null) {
+      status.textContent = 'Need unit';
+      status.classList.add('is-missing');
+    } else if (slotStatus.usesReplacement) {
+      status.textContent = 'Bench ready';
+      status.classList.add('is-bench-ready');
+    } else {
+      status.textContent = 'Core owned';
+      status.classList.add('is-owned');
+    }
+
+    label.appendChild(indexBadge);
+    label.appendChild(role);
+    heading.appendChild(label);
+    heading.appendChild(status);
+    position.appendChild(heading);
+    position.appendChild(control);
+    if (slot.note) position.appendChild(createRumbleElement('p', 'rumble-lineup-note', slot.note));
+    return position;
+  }
+
+  function getRumbleReplacementEntries(availability) {
+    var entries = [];
+    var byId = {};
+
+    availability.slots.forEach(function (slotStatus, index) {
+      var alternatives = [];
+      (slotStatus.slot.alternatives || []).forEach(function (id) {
+        var numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1 || numericId === slotStatus.primaryId || alternatives.indexOf(numericId) !== -1) return;
+        alternatives.push(numericId);
+      });
+
+      alternatives.forEach(function (id) {
+        var entry = byId[id];
+        if (!entry) {
+          entry = {
+            id: id,
+            slots: [],
+            roles: [],
+            selectedSlots: []
+          };
+          byId[id] = entry;
+          entries.push(entry);
+        }
+        if (entry.slots.indexOf(index + 1) === -1) entry.slots.push(index + 1);
+        if (slotStatus.slot.role && entry.roles.indexOf(slotStatus.slot.role) === -1) entry.roles.push(slotStatus.slot.role);
+        if (slotStatus.selectedId === id && entry.selectedSlots.indexOf(index + 1) === -1) entry.selectedSlots.push(index + 1);
+      });
+    });
+
+    return entries;
+  }
+
+  function buildRumbleReplacementBench(availability) {
+    var entries = getRumbleReplacementEntries(availability);
+    if (!entries.length) return null;
+
+    var bench = createRumbleElement('section', 'rumble-replacement-bench');
+    var header = createRumbleElement('div', 'rumble-bench-header');
+    var title = createRumbleElement('h4', '', 'Replacement bench');
+    var copy = createRumbleElement('p', '', 'Listed swaps stay tied to their numbered main-lineup position.');
+    var grid = createRumbleElement('div', 'rumble-bench-grid');
+
+    header.appendChild(title);
+    header.appendChild(copy);
+    bench.appendChild(header);
+
+    entries.forEach(function (entry) {
+      var item = createRumbleElement('article', 'rumble-bench-item');
+      var slotLabel = entry.slots.length === 1
+        ? 'Slot ' + entry.slots[0]
+        : 'Slots ' + entry.slots.join(', ');
+      var roleLabel = entry.roles.length ? ' · ' + entry.roles.join(' / ') : '';
+      var label = createRumbleElement('span', 'rumble-bench-slot-label', slotLabel + roleLabel);
+      var control = buildRumbleUnitControl(getRumbleUnit(entry.id), {
+        compact: true,
+        isReplacement: entry.selectedSlots.length > 0
+      });
+
+      item.classList.toggle('is-selected', entry.selectedSlots.length > 0);
+      label.title = slotLabel + (entry.roles.length ? ' · ' + entry.roles.join(', ') : '');
+      item.appendChild(label);
+      item.appendChild(control);
+      grid.appendChild(item);
+    });
+
+    bench.appendChild(grid);
+    return bench;
+  }
+
+  function buildRumbleCheck(check) {
+    var item = createRumbleElement('li', 'rumble-check');
+    var status = createRumbleElement('span', 'rumble-check-mark', check.passed ? '✓' : '—');
+    var copy = createRumbleElement('span', 'rumble-check-copy');
+    var label = createRumbleElement('strong', '', check.label);
+    var count = createRumbleElement('small', '', check.count + ' / ' + check.minimum + (check.required ? '' : ' · advisory'));
+
+    item.classList.toggle('is-passed', check.passed);
+    item.classList.toggle('is-advisory', !check.required);
+    copy.appendChild(label);
+    copy.appendChild(count);
+    item.appendChild(status);
+    item.appendChild(copy);
+    return item;
+  }
+
+  function appendRumbleNote(container, label, value) {
+    if (!value) return;
+    var note = createRumbleElement('p', 'rumble-team-note');
+    note.appendChild(createRumbleElement('strong', '', label + ': '));
+    note.appendChild(document.createTextNode(value));
+    container.appendChild(note);
+  }
+
+  function buildRumbleTeamCard(team, availability) {
+    var card = createRumbleElement('article', 'rumble-team-card');
+    var header = createRumbleElement('div', 'rumble-team-card-header');
+    var titleGroup = createRumbleElement('div', 'rumble-team-title-group');
+    var tier = createRumbleElement('span', 'rumble-tier rumble-tier-' + normaliseRumbleText(team.tier || 'meta').replace(/\s/g, '-'), team.tier || 'META');
+    var title = createRumbleElement('h3', '', team.name || 'Rumble team');
+    var availabilityCopy = createRumbleElement('div', 'rumble-team-availability');
+    var availabilityTitle = createRumbleElement('strong', '', availability.ready ? 'Ready core' : availability.filled + ' / ' + availability.total + ' roles covered');
+    var availabilityDetail = createRumbleElement('small', '', availability.ready
+      ? 'Owned lineup meets every required setup check.'
+      : availability.missingSlots + ' open role' + (availability.missingSlots === 1 ? '' : 's') + ' · replacements count when owned.');
+    var facets = createRumbleElement('div', 'rumble-facets');
+    var lineup = createRumbleElement('section', 'rumble-lineup');
+    var lineupHeader = createRumbleElement('div', 'rumble-lineup-header');
+    var lineupTitle = createRumbleElement('h4', '', 'Main lineup');
+    var lineupOrder = createRumbleElement('p', 'rumble-lineup-order', 'Source order · slots 1–8');
+    var lineupScroller = createRumbleElement('div', 'rumble-lineup-scroller');
+    var lineupStrip = createRumbleElement('div', 'rumble-lineup-strip');
+    var replacementBench;
+    var checks = createRumbleElement('section', 'rumble-checks');
+    var checksTitle = createRumbleElement('h4', '', 'Setup checks');
+    var checkList = createRumbleElement('ul', 'rumble-check-list');
+    var notes = createRumbleElement('div', 'rumble-team-notes');
+
+    card.classList.toggle('is-ready', availability.ready);
+    card.classList.add('tier-' + normaliseRumbleText(team.tier || 'meta').replace(/\s/g, '-'));
+    titleGroup.appendChild(tier);
+    titleGroup.appendChild(title);
+    header.appendChild(titleGroup);
+    availabilityCopy.appendChild(availabilityTitle);
+    availabilityCopy.appendChild(availabilityDetail);
+    header.appendChild(availabilityCopy);
+    card.appendChild(header);
+    if (team.summary) card.appendChild(createRumbleElement('p', 'rumble-team-summary', team.summary));
+
+    (team.facets || []).forEach(function (facet) {
+      facets.appendChild(createRumbleElement('span', 'rumble-facet', facet));
+    });
+    if (facets.childNodes.length) card.appendChild(facets);
+
+    lineupHeader.appendChild(lineupTitle);
+    lineupHeader.appendChild(lineupOrder);
+    lineup.appendChild(lineupHeader);
+    availability.slots.forEach(function (slot, index) { lineupStrip.appendChild(buildRumbleLineupPosition(slot, index)); });
+    lineupScroller.appendChild(lineupStrip);
+    lineup.appendChild(lineupScroller);
+    card.appendChild(lineup);
+
+    replacementBench = buildRumbleReplacementBench(availability);
+    if (replacementBench) card.appendChild(replacementBench);
+
+    if (availability.checks.length) {
+      checks.appendChild(checksTitle);
+      availability.checks.forEach(function (check) { checkList.appendChild(buildRumbleCheck(check)); });
+      checks.appendChild(checkList);
+      card.appendChild(checks);
+    }
+
+    appendRumbleNote(notes, 'Strength', team.strength);
+    appendRumbleNote(notes, 'Watch for', team.watch);
+    if (notes.childNodes.length) card.appendChild(notes);
+    return card;
+  }
+
+  function teamMatchesRumbleSearch(team, query) {
+    if (!query) return true;
+    var values = [team.name, team.tier, team.summary, team.strength, team.watch]
+      .concat(team.facets || []);
+
+    (team.slots || []).forEach(function (slot) {
+      values.push(slot.role, slot.note);
+      [slot.unitId].concat(slot.alternatives || []).forEach(function (id) {
+        var unit = getRumbleUnit(id);
+        values.push(unit.id, unit.name, unit.type);
+        values = values.concat(unit.classes, unit.tags);
+      });
+    });
+
+    return values.join(' ').toLocaleLowerCase().indexOf(query) !== -1;
+  }
+
+  function formatRumbleDate(value) {
+    if (!value) return 'Not recorded';
+    var raw = String(value);
+    var date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw + 'T12:00:00' : raw);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function buildRumbleEmpty(title, detail, isError) {
+    var empty = createRumbleElement('div', 'rumble-empty');
+    empty.classList.toggle('is-error', Boolean(isError));
+    empty.appendChild(createRumbleElement('strong', '', title));
+    empty.appendChild(createRumbleElement('span', '', detail));
+    return empty;
+  }
+
+  function updateRumbleMetaStatus() {
+    if (!elements.rumbleMetaPatch) return;
+    var meta = state.rumbleMeta;
+    var ids = getRumbleUnitIds();
+    var owned = ids.filter(function (id) { return isRumbleUnitOwned(id); }).length;
+
+    if (meta) {
+      elements.rumbleMetaPatch.textContent = meta.patch || 'Current snapshot';
+      elements.rumbleMetaReviewed.textContent = formatRumbleDate(meta.reviewedAt);
+      if (meta.source && meta.source.url) elements.rumbleSourceLink.href = meta.source.url;
+      if (meta.source && meta.source.compsUrl) elements.rumbleCompsLink.href = meta.source.compsUrl;
+    } else if (state.rumbleMetaError) {
+      elements.rumbleMetaPatch.textContent = 'Unavailable';
+      elements.rumbleMetaReviewed.textContent = 'Unavailable';
+    } else {
+      elements.rumbleMetaPatch.textContent = 'Loading…';
+      elements.rumbleMetaReviewed.textContent = 'Loading…';
+    }
+
+    elements.rumbleOwnedCount.textContent = owned + ' / ' + ids.length;
+    if (state.sharedPreview) {
+      elements.rumbleMetaFeedback.textContent = 'Shared preview is read-only. Save a copy to edit your PvP roster.';
+    } else if (meta && state.rumbleUnitsError) {
+      elements.rumbleMetaFeedback.textContent = 'The reviewed team snapshot loaded, but the current stats/tag snapshot is temporarily unavailable.';
+    } else if (meta && meta.updatePolicy) {
+      elements.rumbleMetaFeedback.textContent = meta.updatePolicy;
+    } else if (state.rumbleMetaError) {
+      elements.rumbleMetaFeedback.textContent = 'The reviewed PvP snapshot could not be loaded. Try refreshing the page.';
+    }
+  }
+
+  function renderRumbleRoster() {
+    if (!elements.rumbleRoster) return;
+    elements.rumbleRoster.hidden = !state.rumbleRosterOpen;
+    elements.rumbleRosterToggle.setAttribute('aria-expanded', String(state.rumbleRosterOpen));
+    elements.rumbleRosterToggle.textContent = state.rumbleRosterOpen ? 'Close PvP roster' : 'Edit PvP roster';
+    if (!state.rumbleRosterOpen) return;
+
+    elements.rumbleRosterGrid.innerHTML = '';
+    if (!state.rumbleMeta) {
+      elements.rumbleRosterGrid.appendChild(buildRumbleEmpty('PvP roster unavailable', 'Load the meta snapshot first.', state.rumbleMetaError));
+      elements.rumbleRosterCount.textContent = '0 shown';
+      return;
+    }
+
+    var query = state.rumbleRosterSearch.trim().toLocaleLowerCase();
+    var units = getRumbleUnitIds().map(getRumbleUnit).filter(function (unit) {
+      if (!query) return true;
+      return [unit.id, unit.name, unit.type].concat(unit.classes, unit.tags).join(' ').toLocaleLowerCase().indexOf(query) !== -1;
+    }).sort(function (left, right) {
+      return left.name.localeCompare(right.name);
+    });
+    var owned = units.filter(function (unit) { return isRumbleUnitOwned(unit.id); }).length;
+    var fragment = document.createDocumentFragment();
+
+    elements.rumbleRosterCount.textContent = units.length + ' shown · ' + owned + ' owned';
+    if (!units.length) {
+      elements.rumbleRosterGrid.appendChild(buildRumbleEmpty('No PvP units match', 'Try a different name, tag, or class search.', false));
+      return;
+    }
+
+    units.forEach(function (unit) {
+      fragment.appendChild(buildRumbleUnitControl(unit, { compact: true }));
+    });
+    elements.rumbleRosterGrid.appendChild(fragment);
+  }
+
+  function renderRumbleMeta() {
+    if (!elements.rumbleTeamGrid) return;
+    updateRumbleMetaStatus();
+    elements.rumbleTeamGrid.innerHTML = '';
+
+    if (!state.rumbleMeta) {
+      elements.rumbleTeamGrid.appendChild(buildRumbleEmpty(
+        state.rumbleMetaError ? 'PvP meta unavailable' : 'Loading PvP meta…',
+        state.rumbleMetaError ? 'Try refreshing the page or check the source guide.' : 'Fetching the reviewed team snapshot.',
+        state.rumbleMetaError
+      ));
+      renderRumbleRoster();
+      return;
+    }
+
+    var query = state.rumbleSearch.trim().toLocaleLowerCase();
+    var teams = (state.rumbleMeta.teams || []).map(function (team) {
+      return { team: team, availability: getRumbleTeamAvailability(team) };
+    }).filter(function (entry) {
+      if (state.rumbleFilter === 'ready' && !entry.availability.ready) return false;
+      if (state.rumbleFilter === 'needs' && entry.availability.ready) return false;
+      return teamMatchesRumbleSearch(entry.team, query);
+    });
+    var fragment = document.createDocumentFragment();
+
+    document.querySelectorAll('[data-rumble-filter]').forEach(function (button) {
+      var active = button.dataset.rumbleFilter === state.rumbleFilter;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    if (!teams.length) {
+      elements.rumbleTeamGrid.appendChild(buildRumbleEmpty('No teams match', 'Try another filter or search for a role, tag, or unit.', false));
+    } else {
+      teams.forEach(function (entry) {
+        fragment.appendChild(buildRumbleTeamCard(entry.team, entry.availability));
+      });
+      elements.rumbleTeamGrid.appendChild(fragment);
+    }
+    renderRumbleRoster();
+  }
+
+  function loadRumbleMeta() {
+    state.rumbleMetaLoading = true;
+    state.rumbleMetaError = false;
+    state.rumbleUnitsError = false;
+    renderRumbleMeta();
+
+    return fetch(RUMBLE_META_URL, { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load PvP meta.');
+        return response.json();
+      })
+      .then(function (meta) {
+        if (!meta || !Array.isArray(meta.teams)) throw new Error('The PvP meta snapshot is invalid.');
+        state.rumbleMeta = meta;
+        return fetch(RUMBLE_META_UNITS_URL, { cache: 'no-store' })
+          .then(function (response) {
+            if (!response.ok) throw new Error('Unable to load PvP unit details.');
+            return response.json();
+          })
+          .then(function (snapshot) {
+            state.rumbleUnits = snapshot && snapshot.units && typeof snapshot.units === 'object' ? snapshot.units : {};
+          })
+          .catch(function () {
+            state.rumbleUnits = {};
+            state.rumbleUnitsError = true;
+          });
+      })
+      .catch(function () {
+        state.rumbleMeta = null;
+        state.rumbleUnits = {};
+        state.rumbleMetaError = true;
+        state.rumbleUnitsError = false;
+      })
+      .then(function () {
+        state.rumbleMetaLoading = false;
+        renderRumbleMeta();
+      });
+  }
+
+  function onRumbleMetaClick(event) {
+    var button = event.target.closest('[data-rumble-unit-id]');
+    if (!button || state.sharedPreview || button.disabled) return;
+    toggleLegendOwned(button.dataset.rumbleUnitId);
+  }
+
+  function chooseRumbleFilter(event) {
+    var button = event.target.closest('[data-rumble-filter]');
+    if (!button) return;
+    state.rumbleFilter = button.dataset.rumbleFilter;
+    renderRumbleMeta();
+  }
+
+  function toggleRumbleRoster() {
+    state.rumbleRosterOpen = !state.rumbleRosterOpen;
+    renderRumbleRoster();
+  }
+
   function getProgress(id) {
     if (!state.progress[id]) state.progress[id] = defaultProgress();
     return state.progress[id];
@@ -827,6 +1519,7 @@
 
     elements.visibleCount.textContent = visible.length + ' of ' + state.legends.length + ' legends shown';
     updateCounters();
+    renderRumbleMeta();
   }
 
   function updateViewMode() {
@@ -866,7 +1559,15 @@
   function persistAndRender() {
     compactProgress();
     saveProgress();
-    renderGrid();
+    renderCurrentPage();
+  }
+
+  function renderCurrentPage() {
+    if (elements.grid) {
+      renderGrid();
+    } else {
+      renderRumbleMeta();
+    }
   }
 
   function findLegend(id) {
@@ -1466,6 +2167,7 @@
     });
     document.querySelector('.filter-group').addEventListener('click', chooseFilter);
     document.querySelector('.view-switch').addEventListener('click', chooseView);
+    if (elements.rumbleTeamGrid) bindRumbleEvents();
     elements.drawerToggle.addEventListener('click', function () { setDrawerOpen(!state.drawerOpen); });
     elements.drawerClose.addEventListener('click', function () { setDrawerOpen(false); });
     elements.drawerScrim.addEventListener('click', function () { setDrawerOpen(false); });
@@ -1505,7 +2207,24 @@
     });
   }
 
+  function bindRumbleEvents() {
+    elements.rumbleTeamGrid.addEventListener('click', onRumbleMetaClick);
+    elements.rumbleRosterGrid.addEventListener('click', onRumbleMetaClick);
+    elements.rumbleSearch.addEventListener('input', function (event) {
+      state.rumbleSearch = event.target.value;
+      renderRumbleMeta();
+    });
+    elements.rumbleRosterSearch.addEventListener('input', function (event) {
+      state.rumbleRosterSearch = event.target.value;
+      renderRumbleRoster();
+    });
+    elements.rumbleFilterGroup.addEventListener('click', chooseRumbleFilter);
+    elements.rumbleRosterToggle.addEventListener('click', toggleRumbleRoster);
+  }
+
   function cacheElements() {
+    elements.themeToggle = byId('theme-toggle');
+    elements.themeToggleLabel = elements.themeToggle ? elements.themeToggle.querySelector('[data-theme-toggle-label]') : null;
     elements.utilityDrawer = byId('utility-drawer');
     elements.drawerToggle = byId('drawer-toggle');
     elements.drawerClose = byId('drawer-close');
@@ -1520,6 +2239,20 @@
     elements.gemEventList = byId('gem-event-list');
     elements.gemEventsSummary = byId('gem-events-summary');
     elements.gemEventsFeedLink = byId('gem-events-feed-link');
+    elements.rumbleTeamGrid = byId('rumble-team-grid');
+    elements.rumbleRoster = byId('rumble-roster');
+    elements.rumbleRosterGrid = byId('rumble-roster-grid');
+    elements.rumbleRosterToggle = byId('rumble-roster-toggle');
+    elements.rumbleSearch = byId('rumble-search');
+    elements.rumbleRosterSearch = byId('rumble-roster-search');
+    elements.rumbleFilterGroup = byId('rumble-filter-group');
+    elements.rumbleMetaPatch = byId('rumble-meta-patch');
+    elements.rumbleMetaReviewed = byId('rumble-meta-reviewed');
+    elements.rumbleOwnedCount = byId('rumble-owned-count');
+    elements.rumbleSourceLink = byId('rumble-source-link');
+    elements.rumbleCompsLink = byId('rumble-comps-link');
+    elements.rumbleRosterCount = byId('rumble-roster-count');
+    elements.rumbleMetaFeedback = byId('rumble-meta-feedback');
     elements.grid = byId('legend-grid');
     elements.template = byId('legend-card-template');
     elements.galleryTemplate = byId('gallery-tile-template');
@@ -1567,6 +2300,15 @@
 
   function start() {
     cacheElements();
+    loadTheme();
+    bindThemeToggle();
+    if (!elements.grid && elements.rumbleTeamGrid) {
+      loadProgress();
+      bindRumbleEvents();
+      window.addEventListener('hashchange', syncSharedPreviewFromUrl);
+      loadRumbleMeta();
+      return;
+    }
     setDrawerOpen(false);
     loadProgress();
     loadGemPlan();
@@ -1575,6 +2317,7 @@
     bindEvents();
     renderGrid();
     loadGemEvents();
+    if (elements.rumbleTeamGrid) loadRumbleMeta();
   }
 
   document.addEventListener('DOMContentLoaded', start);
