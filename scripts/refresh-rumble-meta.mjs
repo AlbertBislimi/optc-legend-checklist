@@ -42,9 +42,13 @@ function normaliseClasses(value) {
   return uniqueStrings(value);
 }
 
-async function fetchText(url) {
+const FETCH_TIMEOUT_MS = 60000;
+const FETCH_RETRIES = 2;
+const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
+
+async function fetchTextOnce(url) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
     const response = await fetch(url, {
@@ -55,6 +59,19 @@ async function fetchText(url) {
     return await response.text();
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+async function fetchText(url) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await fetchTextOnce(url);
+    } catch (error) {
+      if (attempt >= FETCH_RETRIES) throw error;
+      const delay = 2000 * 2 ** attempt;
+      console.warn(`Fetch of ${url} failed (${error.message}); retrying in ${delay / 1000}s…`);
+      await sleep(delay);
+    }
   }
 }
 
